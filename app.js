@@ -1,6 +1,13 @@
 (() => {
   "use strict";
 
+  const homeScreen = document.querySelector("#homeScreen");
+  const homeWall = document.querySelector("#homeWall");
+  const homeMascot = document.querySelector("#homeMascot");
+  const homeMascotSpeech = document.querySelector("#homeMascotSpeech");
+  const mathHomeCupboard = document.querySelector("#mathHomeCupboard");
+  const openMathCupboard = document.querySelector("#openMathCupboard");
+  const backHomeButton = document.querySelector("#backHome");
   const gameWorld = document.querySelector("#gameWorld");
   const waffleBackdrop = document.querySelector("#waffleBackdrop");
   const waffleMascot = document.querySelector("#waffleMascot");
@@ -18,6 +25,7 @@
   let lastFocusedElement = null;
   let toastTimer = null;
   let drawerClearTimer = null;
+  let screenTimer = null;
 
   const iconMarkup = (name) => `<svg aria-hidden="true"><use href="#icon-${name}"></use></svg>`;
 
@@ -163,12 +171,80 @@
     window.setTimeout(() => waffleMascot.classList.remove("bouncing"), 620);
   }
 
+  function bounceHomeMascot(message) {
+    if (message) homeMascotSpeech.textContent = message;
+    homeMascot.classList.remove("bouncing");
+    void homeMascot.offsetWidth;
+    homeMascot.classList.add("bouncing");
+    window.setTimeout(() => homeMascot.classList.remove("bouncing"), 620);
+  }
+
   function bounceWall() {
     document.body.classList.remove("waffle-wall-bounce");
-    void gameWorld.offsetWidth;
+    void document.body.offsetWidth;
     document.body.classList.add("waffle-wall-bounce");
     window.setTimeout(() => document.body.classList.remove("waffle-wall-bounce"), 560);
   }
+
+  function enterMathKitchen() {
+    if (mathHomeCupboard.classList.contains("open")) return;
+    window.clearTimeout(screenTimer);
+    mathHomeCupboard.classList.add("open");
+    openMathCupboard.setAttribute("aria-expanded", "true");
+    bounceHomeMascot("Opening Math & Numbers!");
+
+    screenTimer = window.setTimeout(() => {
+      homeScreen.classList.add("screen-leaving");
+      screenTimer = window.setTimeout(() => {
+        homeScreen.hidden = true;
+        homeScreen.classList.remove("screen-leaving");
+        homeScreen.setAttribute("aria-hidden", "true");
+        gameWorld.hidden = false;
+        gameWorld.setAttribute("aria-hidden", "false");
+        gameWorld.classList.remove("screen-leaving");
+        gameWorld.classList.add("screen-arriving");
+        document.title = "Math & Numbers — Bite Sized Utilities";
+        window.scrollTo({ top: 0, behavior: "auto" });
+        window.setTimeout(() => gameWorld.classList.remove("screen-arriving"), 520);
+      }, 255);
+    }, 680);
+  }
+
+  function returnHome() {
+    window.clearTimeout(screenTimer);
+    closeTool();
+    document.querySelectorAll("[data-cupboard].open").forEach((cupboard) => {
+      cupboard.classList.remove("open");
+      cupboard.querySelector(".cupboard-door").setAttribute("aria-expanded", "false");
+    });
+    gameWorld.classList.add("screen-leaving");
+    screenTimer = window.setTimeout(() => {
+      gameWorld.hidden = true;
+      gameWorld.classList.remove("screen-leaving");
+      gameWorld.setAttribute("aria-hidden", "true");
+      mathHomeCupboard.classList.remove("open");
+      openMathCupboard.setAttribute("aria-expanded", "false");
+      homeMascotSpeech.textContent = "Our first cupboard is ready!";
+      homeScreen.hidden = false;
+      homeScreen.setAttribute("aria-hidden", "false");
+      homeScreen.classList.remove("screen-leaving");
+      document.title = "Bite Sized Utilities";
+      window.scrollTo({ top: 0, behavior: "auto" });
+      requestAnimationFrame(() => openMathCupboard.focus({ preventScroll: true }));
+    }, 255);
+  }
+
+  homeWall.addEventListener("click", () => {
+    bounceWall();
+    bounceHomeMascot("Boing! Choose the cupboard!");
+  });
+  homeMascot.addEventListener("click", () => {
+    bounceWall();
+    bounceHomeMascot("Math snacks are inside!");
+  });
+  homeMascot.addEventListener("animationend", () => homeMascot.classList.remove("bouncing"));
+  openMathCupboard.addEventListener("click", enterMathKitchen);
+  backHomeButton.addEventListener("click", returnHome);
 
   document.querySelectorAll("[data-cupboard]").forEach((cupboard) => {
     const door = cupboard.querySelector(".cupboard-door");
@@ -219,6 +295,8 @@
         if (openCupboard) {
           openCupboard.classList.remove("open");
           openCupboard.querySelector(".cupboard-door").setAttribute("aria-expanded", "false");
+        } else if (!gameWorld.hidden) {
+          returnHome();
         }
       }
     }

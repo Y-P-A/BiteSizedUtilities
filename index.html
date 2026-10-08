@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="A cozy 2.5D kitchen cupboard filled with playful math and number utilities."
+      content="A cozy 2.5D kitchen filled with playful bite-sized utilities."
     />
-    <title>Math &amp; Numbers — Bite Sized Utilities</title>
-    <link rel="icon" href="assets/waffle-mascot-cutout.png" />
+    <title>Bite Sized Utilities</title>
+    <link rel="icon" href="assets/waffle-cup-mascot.webp" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -72,8 +72,71 @@
       </symbol>
     </svg>
 
-    <div class="game-world" id="gameWorld">
+    <section class="home-screen" id="homeScreen" aria-labelledby="homeTitle">
+      <button class="home-wall" id="homeWall" aria-label="Bounce the waffle kitchen wall"></button>
+      <div class="home-top-shelf" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+
+      <header class="home-header">
+        <div class="hanging-rope hanging-rope-left" aria-hidden="true"></div>
+        <div class="hanging-rope hanging-rope-right" aria-hidden="true"></div>
+        <div class="title-sign home-title-sign">
+          <span class="home-title-bite" aria-hidden="true">•</span>
+          <div>
+            <p>Welcome to the tiny utility kitchen</p>
+            <h1 id="homeTitle">Bite Sized<br /><span>Utilities</span></h1>
+          </div>
+          <span class="home-title-bite" aria-hidden="true">•</span>
+        </div>
+      </header>
+
+      <main class="home-kitchen">
+        <div class="home-stage">
+          <div class="home-category-slot">
+            <p class="home-prompt">Choose a cupboard</p>
+            <div class="home-cupboard" id="mathHomeCupboard">
+              <div class="home-cupboard-crown" aria-hidden="true"></div>
+              <div class="home-cupboard-frame">
+                <div class="home-cupboard-inside">
+                  <span class="home-inside-icon"><svg><use href="#icon-calculator"></use></svg></span>
+                  <strong>Math &amp; Numbers</strong>
+                  <span>10 tools ready!</span>
+                  <span class="home-shelf-board" aria-hidden="true"></span>
+                </div>
+                <button class="home-cupboard-door" id="openMathCupboard" aria-expanded="false" aria-label="Open the Math and Numbers cupboard">
+                  <span class="home-door-inset">
+                    <span class="home-door-icons" aria-hidden="true">
+                      <svg><use href="#icon-calculator"></use></svg>
+                      <svg><use href="#icon-prime"></use></svg>
+                    </span>
+                    <strong>Math <span>&amp;</span><br />Numbers</strong>
+                    <small>Tap to open</small>
+                  </span>
+                  <span class="home-door-knob" aria-hidden="true"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <button class="home-mascot" id="homeMascot" aria-label="Bounce the waffle cup mascot">
+            <span class="home-mascot-speech" id="homeMascotSpeech">Our first cupboard is ready!</span>
+            <img src="assets/waffle-cup-mascot.webp" alt="A cheerful waffle cup filled with hot chocolate" />
+          </button>
+        </div>
+        <div class="home-counter" aria-hidden="true"></div>
+      </main>
+    </section>
+
+    <div class="game-world math-screen" id="gameWorld" hidden>
       <button class="waffle-backdrop" id="waffleBackdrop" aria-label="Bounce the waffle wall"></button>
+
+      <nav class="math-nav" aria-label="Kitchen navigation">
+        <button class="back-home-button" id="backHome">
+          <span aria-hidden="true">←</span>
+          Home kitchen
+        </button>
+      </nav>
 
       <header class="kitchen-header">
         <div class="hanging-rope hanging-rope-left" aria-hidden="true"></div>
@@ -258,9 +321,9 @@
         </section>
       </main>
 
-      <button class="waffle-mascot" id="waffleMascot" aria-label="Bounce the waffle mascot">
+      <button class="waffle-mascot waffle-cup-small" id="waffleMascot" aria-label="Bounce the waffle cup mascot">
         <span class="mascot-speech" id="mascotSpeech">Tap a cupboard!</span>
-        <img src="assets/waffle-mascot-cutout.png" alt="A cheerful waffle holding a pencil" />
+        <img src="assets/waffle-cup-mascot.webp" alt="A cheerful waffle cup filled with hot chocolate" />
       </button>
     </div>
 
