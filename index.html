@@ -67,6 +67,13 @@
         <rect x="64" y="7" width="25" height="66" rx="8" fill="#83b4ad" stroke="#4f2f23" stroke-width="5" />
         <path d="M17 59h7M44 57h9M72 55h9" stroke="#fff1c9" stroke-width="6" stroke-linecap="round" />
       </symbol>
+      <symbol id="icon-codehub" viewBox="0 0 96 96">
+        <rect x="12" y="11" width="72" height="57" rx="13" fill="#82bbb6" stroke="#4f2f23" stroke-width="6" />
+        <rect x="22" y="21" width="52" height="37" rx="7" fill="#2f4b49" stroke="#4f2f23" stroke-width="4" />
+        <path d="m38 31-9 8 9 8m20-16 9 8-9 8m-7-20-7 24" fill="none" stroke="#f4c25d" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M7 70h82l-8 14H15Z" fill="#e78167" stroke="#4f2f23" stroke-width="6" stroke-linejoin="round" />
+        <path d="M40 76h16" stroke="#fff1c9" stroke-width="4" stroke-linecap="round" />
+      </symbol>
       <symbol id="icon-close" viewBox="0 0 48 48">
         <path d="m14 14 20 20m0-20L14 34" stroke="currentColor" stroke-width="7" stroke-linecap="round" />
       </symbol>
@@ -92,35 +99,63 @@
       </header>
 
       <main class="home-kitchen">
-        <div class="home-stage">
-          <div class="home-category-slot">
+        <div class="home-stage home-stage-two">
+          <div class="home-category-area">
             <p class="home-prompt">Choose a cupboard</p>
-            <div class="home-cupboard" id="mathHomeCupboard">
-              <div class="home-cupboard-crown" aria-hidden="true"></div>
-              <div class="home-cupboard-frame">
-                <div class="home-cupboard-inside">
-                  <span class="home-inside-icon"><svg><use href="#icon-calculator"></use></svg></span>
-                  <strong>Math &amp; Numbers</strong>
-                  <span>10 tools ready!</span>
-                  <span class="home-shelf-board" aria-hidden="true"></span>
+            <div class="home-category-grid">
+              <div class="home-category-slot">
+                <div class="home-cupboard" id="mathHomeCupboard">
+                  <div class="home-cupboard-crown" aria-hidden="true"></div>
+                  <div class="home-cupboard-frame">
+                    <div class="home-cupboard-inside">
+                      <span class="home-inside-icon"><svg><use href="#icon-calculator"></use></svg></span>
+                      <strong>Math &amp; Numbers</strong>
+                      <span>10 tools ready!</span>
+                      <span class="home-shelf-board" aria-hidden="true"></span>
+                    </div>
+                    <button class="home-cupboard-door" id="openMathCupboard" aria-expanded="false" aria-label="Open the Math and Numbers cupboard">
+                      <span class="home-door-inset">
+                        <span class="home-door-icons" aria-hidden="true">
+                          <svg><use href="#icon-calculator"></use></svg>
+                          <svg><use href="#icon-prime"></use></svg>
+                        </span>
+                        <strong>Math <span>&amp;</span><br />Numbers</strong>
+                        <small>10 utilities</small>
+                      </span>
+                      <span class="home-door-knob" aria-hidden="true"></span>
+                    </button>
+                  </div>
                 </div>
-                <button class="home-cupboard-door" id="openMathCupboard" aria-expanded="false" aria-label="Open the Math and Numbers cupboard">
-                  <span class="home-door-inset">
-                    <span class="home-door-icons" aria-hidden="true">
-                      <svg><use href="#icon-calculator"></use></svg>
-                      <svg><use href="#icon-prime"></use></svg>
-                    </span>
-                    <strong>Math <span>&amp;</span><br />Numbers</strong>
-                    <small>Tap to open</small>
-                  </span>
-                  <span class="home-door-knob" aria-hidden="true"></span>
-                </button>
+              </div>
+
+              <div class="home-category-slot">
+                <div class="home-cupboard home-cupboard-code" id="codingHomeCupboard">
+                  <div class="home-cupboard-crown" aria-hidden="true"></div>
+                  <div class="home-cupboard-frame">
+                    <div class="home-cupboard-inside">
+                      <span class="home-inside-icon"><svg><use href="#icon-codehub"></use></svg></span>
+                      <strong>Coding &amp; Developing</strong>
+                      <span>CodeHub is ready!</span>
+                      <span class="home-shelf-board" aria-hidden="true"></span>
+                    </div>
+                    <button class="home-cupboard-door" id="openCodingCupboard" aria-expanded="false" aria-label="Open the Coding and Developing cupboard">
+                      <span class="home-door-inset">
+                        <span class="home-door-icons home-door-icons-single" aria-hidden="true">
+                          <svg><use href="#icon-codehub"></use></svg>
+                        </span>
+                        <strong>Coding <span>&amp;</span><br />Developing</strong>
+                        <small>1 utility</small>
+                      </span>
+                      <span class="home-door-knob" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           <button class="home-mascot" id="homeMascot" aria-label="Bounce the waffle cup mascot">
-            <span class="home-mascot-speech" id="homeMascotSpeech">Our first cupboard is ready!</span>
+            <span class="home-mascot-speech" id="homeMascotSpeech">Two cupboards are ready!</span>
             <img src="assets/waffle-cup-mascot.webp" alt="A cheerful waffle cup filled with hot chocolate" />
           </button>
         </div>
@@ -128,7 +163,7 @@
       </main>
     </section>
 
-    <div class="game-world math-screen" id="gameWorld" hidden>
+    <div class="game-world math-screen category-screen" id="gameWorld" data-category-screen="math" hidden>
       <button class="waffle-backdrop" id="waffleBackdrop" aria-label="Bounce the waffle wall"></button>
 
       <nav class="math-nav" aria-label="Kitchen navigation">
@@ -138,191 +173,127 @@
         </button>
       </nav>
 
-      <header class="kitchen-header">
+      <header class="kitchen-header category-header">
         <div class="hanging-rope hanging-rope-left" aria-hidden="true"></div>
         <div class="hanging-rope hanging-rope-right" aria-hidden="true"></div>
         <div class="title-sign">
           <span class="title-doodle" aria-hidden="true">×</span>
           <div>
-            <p>Open a cupboard. Pick up a tool.</p>
+            <p>One cupboard. Ten tools.</p>
             <h1>Math <span>&amp;</span> Numbers</h1>
           </div>
           <span class="title-doodle" aria-hidden="true">÷</span>
         </div>
       </header>
 
-      <main class="kitchen-main">
-        <section class="cupboard-wall" aria-label="Math and Numbers cupboards">
-          <article class="cupboard cupboard-coral" data-cupboard>
-            <div class="cupboard-top" aria-hidden="true"></div>
-            <div class="cupboard-frame">
-              <div class="cupboard-inside">
-                <div class="utility-row">
-                  <button class="utility-object" data-tool="calculator" aria-label="Open Calculator">
-                    <span class="utility-art utility-art-coral"><svg><use href="#icon-calculator"></use></svg></span>
-                    <span>Calculator</span>
-                  </button>
-                  <button class="utility-object" data-tool="fraction" aria-label="Open Fraction Calculator">
-                    <span class="utility-art utility-art-lilac"><svg><use href="#icon-fraction"></use></svg></span>
-                    <span>Fraction<br />Calculator</span>
-                  </button>
-                </div>
-                <div class="shelf-board" aria-hidden="true"></div>
-                <button class="cupboard-close" aria-label="Close Quick Counts cupboard">
-                  <svg><use href="#icon-close"></use></svg>
+      <main class="category-cabinet-scene">
+        <section class="open-category-cabinet math-category-cabinet" aria-label="Open Math and Numbers cupboard containing ten utilities">
+          <div class="category-cabinet-crown" aria-hidden="true"></div>
+          <div class="category-cabinet-frame">
+            <div class="category-cabinet-back">
+              <div class="category-shelf">
+                <button class="shelf-utility" data-tool="calculator" aria-label="Open Calculator">
+                  <span class="utility-art utility-art-coral"><svg><use href="#icon-calculator"></use></svg></span>
+                  <span>Calculator</span>
+                </button>
+                <button class="shelf-utility" data-tool="graph" aria-label="Open Graphing Calculator">
+                  <span class="utility-art utility-art-teal"><svg><use href="#icon-graph"></use></svg></span>
+                  <span>Graphing<br />Calculator</span>
                 </button>
               </div>
-              <button class="cupboard-door" aria-expanded="false">
-                <span class="door-inset">
-                  <svg class="door-icon"><use href="#icon-calculator"></use></svg>
-                  <span class="door-label">Quick Counts</span>
-                </span>
-                <span class="door-knob" aria-hidden="true"></span>
-              </button>
-            </div>
-          </article>
-
-          <article class="cupboard cupboard-sage" data-cupboard>
-            <div class="cupboard-top" aria-hidden="true"></div>
-            <div class="cupboard-frame">
-              <div class="cupboard-inside">
-                <div class="utility-row">
-                  <button class="utility-object" data-tool="graph" aria-label="Open Graphing Calculator">
-                    <span class="utility-art utility-art-teal"><svg><use href="#icon-graph"></use></svg></span>
-                    <span>Graphing<br />Calculator</span>
-                  </button>
-                  <button class="utility-object" data-tool="body" aria-label="Open Bodily Calculator">
-                    <span class="utility-art utility-art-sage"><svg><use href="#icon-body"></use></svg></span>
-                    <span>Bodily<br />Calculator</span>
-                  </button>
-                </div>
-                <div class="shelf-board" aria-hidden="true"></div>
-                <button class="cupboard-close" aria-label="Close Curves and Measures cupboard">
-                  <svg><use href="#icon-close"></use></svg>
+              <div class="category-shelf">
+                <button class="shelf-utility" data-tool="body" aria-label="Open Bodily Calculator">
+                  <span class="utility-art utility-art-sage"><svg><use href="#icon-body"></use></svg></span>
+                  <span>Bodily<br />Calculator</span>
+                </button>
+                <button class="shelf-utility" data-tool="fraction" aria-label="Open Fraction Calculator">
+                  <span class="utility-art utility-art-lilac"><svg><use href="#icon-fraction"></use></svg></span>
+                  <span>Fraction<br />Calculator</span>
                 </button>
               </div>
-              <button class="cupboard-door" aria-expanded="false">
-                <span class="door-inset">
-                  <svg class="door-icon"><use href="#icon-graph"></use></svg>
-                  <span class="door-label">Curves &amp; Measures</span>
-                </span>
-                <span class="door-knob" aria-hidden="true"></span>
-              </button>
-            </div>
-          </article>
-
-          <article class="cupboard cupboard-honey" data-cupboard>
-            <div class="cupboard-top" aria-hidden="true"></div>
-            <div class="cupboard-frame">
-              <div class="cupboard-inside">
-                <div class="utility-row">
-                  <button class="utility-object" data-tool="percentage" aria-label="Open Percentage Calculator">
-                    <span class="utility-art utility-art-honey"><svg><use href="#icon-percent"></use></svg></span>
-                    <span>Percentage<br />Calculator</span>
-                  </button>
-                  <button class="utility-object" data-tool="dice" aria-label="Open Dice Roller">
-                    <span class="utility-art utility-art-teal"><svg><use href="#icon-dice"></use></svg></span>
-                    <span>Dice Roller</span>
-                  </button>
-                </div>
-                <div class="shelf-board" aria-hidden="true"></div>
-                <button class="cupboard-close" aria-label="Close Deals and Dice cupboard">
-                  <svg><use href="#icon-close"></use></svg>
+              <div class="category-shelf">
+                <button class="shelf-utility" data-tool="percentage" aria-label="Open Percentage Calculator">
+                  <span class="utility-art utility-art-honey"><svg><use href="#icon-percent"></use></svg></span>
+                  <span>Percentage<br />Calculator</span>
+                </button>
+                <button class="shelf-utility" data-tool="dice" aria-label="Open Dice Roller">
+                  <span class="utility-art utility-art-teal"><svg><use href="#icon-dice"></use></svg></span>
+                  <span>Dice Roller</span>
                 </button>
               </div>
-              <button class="cupboard-door" aria-expanded="false">
-                <span class="door-inset">
-                  <svg class="door-icon"><use href="#icon-dice"></use></svg>
-                  <span class="door-label">Deals &amp; Dice</span>
-                </span>
-                <span class="door-knob" aria-hidden="true"></span>
-              </button>
-            </div>
-          </article>
-
-          <article class="cupboard cupboard-lilac" data-cupboard>
-            <div class="cupboard-top" aria-hidden="true"></div>
-            <div class="cupboard-frame">
-              <div class="cupboard-inside">
-                <div class="utility-row">
-                  <button class="utility-object" data-tool="roman" aria-label="Open Roman Numeral Calculator">
-                    <span class="utility-art utility-art-parchment"><svg><use href="#icon-roman"></use></svg></span>
-                    <span>Roman Numeral<br />Calculator</span>
-                  </button>
-                  <button class="utility-object" data-tool="base" aria-label="Open Number Base Converter">
-                    <span class="utility-art utility-art-coral"><svg><use href="#icon-base"></use></svg></span>
-                    <span>Number Base<br />Converter</span>
-                  </button>
-                </div>
-                <div class="shelf-board" aria-hidden="true"></div>
-                <button class="cupboard-close" aria-label="Close Number Languages cupboard">
-                  <svg><use href="#icon-close"></use></svg>
+              <div class="category-shelf">
+                <button class="shelf-utility" data-tool="roman" aria-label="Open Roman Numeral Calculator">
+                  <span class="utility-art utility-art-parchment"><svg><use href="#icon-roman"></use></svg></span>
+                  <span>Roman Numeral<br />Calculator</span>
+                </button>
+                <button class="shelf-utility" data-tool="base" aria-label="Open Number Base Converter">
+                  <span class="utility-art utility-art-coral"><svg><use href="#icon-base"></use></svg></span>
+                  <span>Number Base<br />Converter</span>
                 </button>
               </div>
-              <button class="cupboard-door" aria-expanded="false">
-                <span class="door-inset">
-                  <svg class="door-icon"><use href="#icon-roman"></use></svg>
-                  <span class="door-label">Number Languages</span>
-                </span>
-                <span class="door-knob" aria-hidden="true"></span>
-              </button>
-            </div>
-          </article>
-
-          <article class="cupboard cupboard-teal" data-cupboard>
-            <div class="cupboard-top" aria-hidden="true"></div>
-            <div class="cupboard-frame">
-              <div class="cupboard-inside cupboard-inside-single">
-                <div class="utility-row">
-                  <button class="utility-object utility-object-wide" data-tool="prime" aria-label="Open Prime Number Checker">
-                    <span class="utility-art utility-art-honey"><svg><use href="#icon-prime"></use></svg></span>
-                    <span>Prime Number<br />Checker</span>
-                  </button>
-                </div>
-                <div class="shelf-board" aria-hidden="true"></div>
-                <button class="cupboard-close" aria-label="Close Prime Pantry cupboard">
-                  <svg><use href="#icon-close"></use></svg>
+              <div class="category-shelf">
+                <button class="shelf-utility" data-tool="prime" aria-label="Open Prime Number Checker">
+                  <span class="utility-art utility-art-honey"><svg><use href="#icon-prime"></use></svg></span>
+                  <span>Prime Number<br />Checker</span>
+                </button>
+                <button class="shelf-utility" data-tool="sequence" aria-label="Open Sequence Playground">
+                  <span class="utility-art utility-art-sage"><svg><use href="#icon-sequence"></use></svg></span>
+                  <span>Sequence<br />Playground</span>
                 </button>
               </div>
-              <button class="cupboard-door" aria-expanded="false">
-                <span class="door-inset">
-                  <svg class="door-icon"><use href="#icon-prime"></use></svg>
-                  <span class="door-label">Prime Pantry</span>
-                </span>
-                <span class="door-knob" aria-hidden="true"></span>
-              </button>
             </div>
-          </article>
-
-          <article class="cupboard cupboard-blue" data-cupboard>
-            <div class="cupboard-top" aria-hidden="true"></div>
-            <div class="cupboard-frame">
-              <div class="cupboard-inside cupboard-inside-single">
-                <div class="utility-row">
-                  <button class="utility-object utility-object-wide" data-tool="sequence" aria-label="Open Sequence Playground">
-                    <span class="utility-art utility-art-sage"><svg><use href="#icon-sequence"></use></svg></span>
-                    <span>Sequence<br />Playground</span>
-                  </button>
-                </div>
-                <div class="shelf-board" aria-hidden="true"></div>
-                <button class="cupboard-close" aria-label="Close Sequence Shelf cupboard">
-                  <svg><use href="#icon-close"></use></svg>
-                </button>
-              </div>
-              <button class="cupboard-door" aria-expanded="false">
-                <span class="door-inset">
-                  <svg class="door-icon"><use href="#icon-sequence"></use></svg>
-                  <span class="door-label">Sequence Shelf</span>
-                </span>
-                <span class="door-knob" aria-hidden="true"></span>
-              </button>
-            </div>
-          </article>
+          </div>
         </section>
       </main>
 
       <button class="waffle-mascot waffle-cup-small" id="waffleMascot" aria-label="Bounce the waffle cup mascot">
-        <span class="mascot-speech" id="mascotSpeech">Tap a cupboard!</span>
+        <span class="mascot-speech" id="mascotSpeech">Pick a tool!</span>
+        <img src="assets/waffle-cup-mascot.webp" alt="A cheerful waffle cup filled with hot chocolate" />
+      </button>
+    </div>
+
+    <div class="game-world coding-screen category-screen" id="codingWorld" data-category-screen="coding" hidden>
+      <button class="waffle-backdrop" id="codingWaffleBackdrop" aria-label="Bounce the waffle wall"></button>
+
+      <nav class="math-nav" aria-label="Kitchen navigation">
+        <button class="back-home-button" id="backHomeCoding">
+          <span aria-hidden="true">←</span>
+          Home kitchen
+        </button>
+      </nav>
+
+      <header class="kitchen-header category-header">
+        <div class="hanging-rope hanging-rope-left" aria-hidden="true"></div>
+        <div class="hanging-rope hanging-rope-right" aria-hidden="true"></div>
+        <div class="title-sign coding-title-sign">
+          <span class="title-doodle" aria-hidden="true">&lt;</span>
+          <div>
+            <p>Build it. Run it. See it.</p>
+            <h1>Coding <span>&amp;</span> Developing</h1>
+          </div>
+          <span class="title-doodle" aria-hidden="true">/&gt;</span>
+        </div>
+      </header>
+
+      <main class="category-cabinet-scene coding-cabinet-scene">
+        <section class="open-category-cabinet coding-category-cabinet" aria-label="Open Coding and Developing cupboard containing CodeHub">
+          <div class="category-cabinet-crown" aria-hidden="true"></div>
+          <div class="category-cabinet-frame">
+            <div class="category-cabinet-back">
+              <div class="category-shelf category-shelf-single">
+                <button class="shelf-utility shelf-utility-featured" data-tool="codehub" aria-label="Open CodeHub">
+                  <span class="utility-art utility-art-code"><svg><use href="#icon-codehub"></use></svg></span>
+                  <span>CodeHub</span>
+                  <small>Web · Python · C · C++</small>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <button class="waffle-mascot waffle-cup-small" id="codingMascot" aria-label="Bounce the waffle cup mascot">
+        <span class="mascot-speech" id="codingMascotSpeech">CodeHub is ready!</span>
         <img src="assets/waffle-cup-mascot.webp" alt="A cheerful waffle cup filled with hot chocolate" />
       </button>
     </div>
@@ -334,7 +305,7 @@
         <header class="tool-header">
           <div class="tool-heading-icon" id="toolHeadingIcon"></div>
           <div class="tool-heading-copy">
-            <p>Math &amp; Numbers</p>
+            <p id="toolCategory">Math &amp; Numbers</p>
             <h2 id="toolTitle"></h2>
           </div>
           <button class="round-close" id="closeTool" aria-label="Back to cupboards">

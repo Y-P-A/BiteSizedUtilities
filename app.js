@@ -6,15 +6,23 @@
   const homeMascot = document.querySelector("#homeMascot");
   const homeMascotSpeech = document.querySelector("#homeMascotSpeech");
   const mathHomeCupboard = document.querySelector("#mathHomeCupboard");
+  const codingHomeCupboard = document.querySelector("#codingHomeCupboard");
   const openMathCupboard = document.querySelector("#openMathCupboard");
+  const openCodingCupboard = document.querySelector("#openCodingCupboard");
   const backHomeButton = document.querySelector("#backHome");
+  const backHomeCodingButton = document.querySelector("#backHomeCoding");
   const gameWorld = document.querySelector("#gameWorld");
+  const codingWorld = document.querySelector("#codingWorld");
   const waffleBackdrop = document.querySelector("#waffleBackdrop");
+  const codingWaffleBackdrop = document.querySelector("#codingWaffleBackdrop");
   const waffleMascot = document.querySelector("#waffleMascot");
+  const codingMascot = document.querySelector("#codingMascot");
   const mascotSpeech = document.querySelector("#mascotSpeech");
+  const codingMascotSpeech = document.querySelector("#codingMascotSpeech");
   const toolOverlay = document.querySelector("#toolOverlay");
   const toolBody = document.querySelector("#toolBody");
   const toolTitle = document.querySelector("#toolTitle");
+  const toolCategory = document.querySelector("#toolCategory");
   const toolHeadingIcon = document.querySelector("#toolHeadingIcon");
   const closeToolButton = document.querySelector("#closeTool");
   const overlayCurtain = document.querySelector("#overlayCurtain");
@@ -22,6 +30,8 @@
   const confettiField = document.querySelector("#confettiField");
 
   let activeCleanup = [];
+  let activeCategoryKey = null;
+  let activeToolToken = 0;
   let lastFocusedElement = null;
   let toastTimer = null;
   let drawerClearTimer = null;
@@ -100,6 +110,38 @@
       render: renderSequencePlayground,
       init: initSequencePlayground,
     },
+    codehub: {
+      title: "CodeHub",
+      category: "Coding & Developing",
+      categoryKey: "coding",
+      icon: "codehub",
+      color: "#92c8c1",
+      render: renderCodeHub,
+      init: initCodeHub,
+    },
+  };
+
+  const categories = {
+    math: {
+      homeCupboard: mathHomeCupboard,
+      door: openMathCupboard,
+      screen: gameWorld,
+      mascot: waffleMascot,
+      speech: mascotSpeech,
+      title: "Math & Numbers — Bite Sized Utilities",
+      opening: "Opening Math & Numbers!",
+      ready: "Pick a tool!",
+    },
+    coding: {
+      homeCupboard: codingHomeCupboard,
+      door: openCodingCupboard,
+      screen: codingWorld,
+      mascot: codingMascot,
+      speech: codingMascotSpeech,
+      title: "Coding & Developing — Bite Sized Utilities",
+      opening: "Opening Coding & Developing!",
+      ready: "CodeHub is ready!",
+    },
   };
 
   function addCleanup(callback) {
@@ -123,19 +165,25 @@
 
     window.clearTimeout(drawerClearTimer);
     cleanActiveTool();
+    const toolToken = ++activeToolToken;
     lastFocusedElement = trigger || document.activeElement;
+    activeCategoryKey = tool.categoryKey || "math";
     toolTitle.textContent = tool.title;
+    toolCategory.textContent = tool.category || "Math & Numbers";
     toolHeadingIcon.innerHTML = iconMarkup(tool.icon);
     toolHeadingIcon.style.backgroundColor = tool.color;
     toolBody.innerHTML = tool.render();
     toolBody.scrollTop = 0;
+    toolOverlay.classList.toggle("codehub-open", toolKey === "codehub");
 
     toolOverlay.classList.add("open");
     toolOverlay.setAttribute("aria-hidden", "false");
     document.body.classList.add("drawer-open");
-    mascotSpeech.textContent = "Math snack time!";
+    const category = categories[activeCategoryKey];
+    if (category) category.speech.textContent = toolKey === "codehub" ? "Let's make something!" : "Math snack time!";
 
     requestAnimationFrame(() => {
+      if (toolToken !== activeToolToken || !toolOverlay.classList.contains("open")) return;
       tool.init(toolBody);
       closeToolButton.focus({ preventScroll: true });
     });
@@ -143,13 +191,16 @@
 
   function closeTool() {
     if (!toolOverlay.classList.contains("open")) return;
+    activeToolToken += 1;
     cleanActiveTool();
     toolOverlay.classList.remove("open");
     toolOverlay.setAttribute("aria-hidden", "true");
     document.body.classList.remove("drawer-open");
-    mascotSpeech.textContent = "Pick another tool!";
+    const category = categories[activeCategoryKey];
+    if (category) category.speech.textContent = category.ready;
     drawerClearTimer = window.setTimeout(() => {
       toolBody.innerHTML = "";
+      toolOverlay.classList.remove("codehub-open");
     }, 500);
     if (lastFocusedElement && document.contains(lastFocusedElement)) {
       lastFocusedElement.focus({ preventScroll: true });
@@ -163,12 +214,14 @@
     toastTimer = window.setTimeout(() => toast.classList.remove("show"), 1900);
   }
 
-  function bounceMascot(message) {
-    if (message) mascotSpeech.textContent = message;
-    waffleMascot.classList.remove("bouncing");
-    void waffleMascot.offsetWidth;
-    waffleMascot.classList.add("bouncing");
-    window.setTimeout(() => waffleMascot.classList.remove("bouncing"), 620);
+  function bounceCategoryMascot(categoryKey, message) {
+    const category = categories[categoryKey];
+    if (!category) return;
+    if (message) category.speech.textContent = message;
+    category.mascot.classList.remove("bouncing");
+    void category.mascot.offsetWidth;
+    category.mascot.classList.add("bouncing");
+    window.setTimeout(() => category.mascot.classList.remove("bouncing"), 620);
   }
 
   function bounceHomeMascot(message) {
@@ -186,12 +239,13 @@
     window.setTimeout(() => document.body.classList.remove("waffle-wall-bounce"), 560);
   }
 
-  function enterMathKitchen() {
-    if (mathHomeCupboard.classList.contains("open")) return;
+  function enterCategory(categoryKey) {
+    const category = categories[categoryKey];
+    if (!category || category.homeCupboard.classList.contains("open")) return;
     window.clearTimeout(screenTimer);
-    mathHomeCupboard.classList.add("open");
-    openMathCupboard.setAttribute("aria-expanded", "true");
-    bounceHomeMascot("Opening Math & Numbers!");
+    category.homeCupboard.classList.add("open");
+    category.door.setAttribute("aria-expanded", "true");
+    bounceHomeMascot(category.opening);
 
     screenTimer = window.setTimeout(() => {
       homeScreen.classList.add("screen-leaving");
@@ -199,76 +253,56 @@
         homeScreen.hidden = true;
         homeScreen.classList.remove("screen-leaving");
         homeScreen.setAttribute("aria-hidden", "true");
-        gameWorld.hidden = false;
-        gameWorld.setAttribute("aria-hidden", "false");
-        gameWorld.classList.remove("screen-leaving");
-        gameWorld.classList.add("screen-arriving");
-        document.title = "Math & Numbers — Bite Sized Utilities";
+        category.screen.hidden = false;
+        category.screen.setAttribute("aria-hidden", "false");
+        category.screen.classList.remove("screen-leaving");
+        category.screen.classList.add("screen-arriving");
+        activeCategoryKey = categoryKey;
+        document.title = category.title;
         window.scrollTo({ top: 0, behavior: "auto" });
-        window.setTimeout(() => gameWorld.classList.remove("screen-arriving"), 520);
+        window.setTimeout(() => category.screen.classList.remove("screen-arriving"), 520);
       }, 255);
     }, 680);
   }
 
   function returnHome() {
+    const category = Object.values(categories).find((item) => !item.screen.hidden);
+    if (!category) return;
     window.clearTimeout(screenTimer);
     closeTool();
-    document.querySelectorAll("[data-cupboard].open").forEach((cupboard) => {
-      cupboard.classList.remove("open");
-      cupboard.querySelector(".cupboard-door").setAttribute("aria-expanded", "false");
-    });
-    gameWorld.classList.add("screen-leaving");
+    category.screen.classList.add("screen-leaving");
     screenTimer = window.setTimeout(() => {
-      gameWorld.hidden = true;
-      gameWorld.classList.remove("screen-leaving");
-      gameWorld.setAttribute("aria-hidden", "true");
-      mathHomeCupboard.classList.remove("open");
-      openMathCupboard.setAttribute("aria-expanded", "false");
-      homeMascotSpeech.textContent = "Our first cupboard is ready!";
+      category.screen.hidden = true;
+      category.screen.classList.remove("screen-leaving");
+      category.screen.setAttribute("aria-hidden", "true");
+      Object.values(categories).forEach((item) => {
+        item.homeCupboard.classList.remove("open");
+        item.door.setAttribute("aria-expanded", "false");
+      });
+      homeMascotSpeech.textContent = "Two cupboards are ready!";
       homeScreen.hidden = false;
       homeScreen.setAttribute("aria-hidden", "false");
       homeScreen.classList.remove("screen-leaving");
       document.title = "Bite Sized Utilities";
+      activeCategoryKey = null;
       window.scrollTo({ top: 0, behavior: "auto" });
-      requestAnimationFrame(() => openMathCupboard.focus({ preventScroll: true }));
+      requestAnimationFrame(() => category.door.focus({ preventScroll: true }));
     }, 255);
   }
 
   homeWall.addEventListener("click", () => {
     bounceWall();
-    bounceHomeMascot("Boing! Choose the cupboard!");
+    bounceHomeMascot("Boing! Choose a cupboard!");
   });
   homeMascot.addEventListener("click", () => {
     bounceWall();
-    bounceHomeMascot("Math snacks are inside!");
+    bounceHomeMascot("Math or code? Pick a cupboard!");
   });
   homeMascot.addEventListener("animationend", () => homeMascot.classList.remove("bouncing"));
-  openMathCupboard.addEventListener("click", enterMathKitchen);
+  openMathCupboard.addEventListener("click", () => enterCategory("math"));
+  openCodingCupboard.addEventListener("click", () => enterCategory("coding"));
   backHomeButton.addEventListener("click", returnHome);
-
-  document.querySelectorAll("[data-cupboard]").forEach((cupboard) => {
-    const door = cupboard.querySelector(".cupboard-door");
-    const close = cupboard.querySelector(".cupboard-close");
-
-    door.addEventListener("click", () => {
-      document.querySelectorAll("[data-cupboard].open").forEach((openCupboard) => {
-        if (openCupboard !== cupboard) {
-          openCupboard.classList.remove("open");
-          openCupboard.querySelector(".cupboard-door").setAttribute("aria-expanded", "false");
-        }
-      });
-      cupboard.classList.add("open");
-      door.setAttribute("aria-expanded", "true");
-      bounceMascot("The shelf is open!");
-    });
-
-    close.addEventListener("click", () => {
-      cupboard.classList.remove("open");
-      door.setAttribute("aria-expanded", "false");
-      mascotSpeech.textContent = "Tap a cupboard!";
-      window.setTimeout(() => door.focus({ preventScroll: true }), 180);
-    });
-  });
+  backHomeCodingButton.addEventListener("click", returnHome);
 
   document.querySelectorAll("[data-tool]").forEach((button) => {
     button.addEventListener("click", () => openTool(button.dataset.tool, button));
@@ -276,13 +310,22 @@
 
   waffleBackdrop.addEventListener("click", () => {
     bounceWall();
-    bounceMascot("Boing!");
+    bounceCategoryMascot("math", "Boing!");
+  });
+  codingWaffleBackdrop.addEventListener("click", () => {
+    bounceWall();
+    bounceCategoryMascot("coding", "Boing!");
   });
   waffleMascot.addEventListener("click", () => {
     bounceWall();
-    bounceMascot("Ready to crunch numbers!");
+    bounceCategoryMascot("math", "Ready to crunch numbers!");
+  });
+  codingMascot.addEventListener("click", () => {
+    bounceWall();
+    bounceCategoryMascot("coding", "Ready to run code!");
   });
   waffleMascot.addEventListener("animationend", () => waffleMascot.classList.remove("bouncing"));
+  codingMascot.addEventListener("animationend", () => codingMascot.classList.remove("bouncing"));
   closeToolButton.addEventListener("click", closeTool);
   overlayCurtain.addEventListener("click", closeTool);
 
@@ -290,14 +333,8 @@
     if (event.key === "Escape") {
       if (toolOverlay.classList.contains("open")) {
         closeTool();
-      } else {
-        const openCupboard = document.querySelector("[data-cupboard].open");
-        if (openCupboard) {
-          openCupboard.classList.remove("open");
-          openCupboard.querySelector(".cupboard-door").setAttribute("aria-expanded", "false");
-        } else if (!gameWorld.hidden) {
-          returnHome();
-        }
+      } else if (Object.values(categories).some((category) => !category.screen.hidden)) {
+        returnHome();
       }
     }
   });
@@ -1635,7 +1672,7 @@
         face.textContent = "•ᴗ•";
         message.textContent = "Prime! Only 1 and itself divide it.";
         celebratePrime();
-        bounceMascot("A prime! Hooray!");
+        bounceCategoryMascot("math", "A prime! Hooray!");
       } else if (value < 2n) {
         face.textContent = "•‿•";
         message.textContent = "Neither prime nor composite.";
@@ -1802,5 +1839,429 @@
     });
     countRange.addEventListener("input", draw);
     draw();
+  }
+
+
+  /* CodeHub */
+  const codeHubRuntimeState = {
+    scriptPromises: new Map(),
+    pyodidePromise: null,
+    compilers: new Map(),
+  };
+
+  const codeHubTemplates = {
+    web: {
+      html: `<main class="hello-card">
+  <span class="badge">CodeHub</span>
+  <h1>Hello, tiny web!</h1>
+  <p id="message">HTML, CSS, and JavaScript are playing together.</p>
+  <button id="spark">Make a spark</button>
+</main>`,
+      css: `body {
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  background: #f5dba8;
+  color: #4f2f23;
+  font-family: system-ui, sans-serif;
+}
+
+.hello-card {
+  width: min(360px, 80vw);
+  padding: 32px;
+  border: 5px solid #4f2f23;
+  border-radius: 28px;
+  background: #fff1cf;
+  box-shadow: 0 12px 0 #a96840;
+  text-align: center;
+}
+
+.badge, button {
+  display: inline-block;
+  padding: 9px 14px;
+  border: 3px solid #4f2f23;
+  border-radius: 14px;
+  background: #82b9b3;
+  font-weight: 800;
+}
+
+button {
+  background: #efb94f;
+  cursor: pointer;
+}`,
+      js: `const button = document.querySelector('#spark');
+const message = document.querySelector('#message');
+let sparks = 0;
+
+button.addEventListener('click', () => {
+  sparks += 1;
+  message.textContent = \`You made \${sparks} spark\${sparks === 1 ? '' : 's'}!\`;
+  console.log('Spark count:', sparks);
+});`,
+    },
+    python: `name = input("What is your name? ")
+for bite in range(1, 4):
+    print(f"{bite}: Hello, {name}!")
+
+squares = [number ** 2 for number in range(1, 6)]
+print("Tiny squares:", squares)`,
+    c: `#include <stdio.h>
+
+int main(void) {
+    char name[64];
+    printf("What is your name? ");
+    if (scanf("%63s", name) != 1) return 1;
+
+    for (int bite = 1; bite <= 3; ++bite) {
+        printf("%d: Hello, %s!\\n", bite, name);
+    }
+    return 0;
+}`,
+    cpp: `#include <iostream>
+#include <string>
+#include <vector>
+
+int main() {
+    std::string name;
+    std::cout << "What is your name? ";
+    std::cin >> name;
+
+    std::vector<int> squares;
+    for (int number = 1; number <= 5; ++number) {
+        squares.push_back(number * number);
+    }
+
+    std::cout << "Hello, " << name << "! Tiny squares:";
+    for (int value : squares) std::cout << ' ' << value;
+    std::cout << '\\n';
+    return 0;
+}`,
+  };
+
+  function renderCodeHub() {
+    return `
+      <div class="codehub-shell">
+        <div class="codehub-top-panel">
+          <div class="segmented codehub-language-tabs" role="tablist" aria-label="CodeHub language">
+            <button class="tab-button active" data-code-language="web" aria-selected="true">HTML · CSS · JS</button>
+            <button class="tab-button" data-code-language="python" aria-selected="false">Python</button>
+            <button class="tab-button" data-code-language="c" aria-selected="false">C</button>
+            <button class="tab-button" data-code-language="cpp" aria-selected="false">C++</button>
+          </div>
+          <div class="codehub-runtime-card" aria-live="polite">
+            <span class="runtime-dot ready" id="codeRuntimeDot"></span>
+            <div>
+              <span>Runtime</span>
+              <strong id="codeRuntimeLabel">Your browser · ready</strong>
+            </div>
+            <div class="runtime-progress" aria-hidden="true"><span id="runtimeProgressBar"></span></div>
+          </div>
+        </div>
+
+        <div class="codehub-workspace">
+          <section class="codehub-editor-card">
+            <div class="codehub-file-tabs" id="webFileTabs" role="tablist" aria-label="Web files">
+              <button class="code-file-tab active" data-web-file="html" aria-selected="true">index.html</button>
+              <button class="code-file-tab" data-web-file="css" aria-selected="false">style.css</button>
+              <button class="code-file-tab" data-web-file="js" aria-selected="false">script.js</button>
+            </div>
+            <div class="codehub-editor-heading">
+              <span class="code-file-name" id="codeFileName">index.html</span>
+              <span class="code-language-pill" id="codeLanguagePill">WEB TRIO</span>
+            </div>
+            <textarea class="code-editor" id="codeEditor" aria-label="Code editor" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+            <div class="codehub-stdin" id="codeStdinWrap" hidden>
+              <label for="codeStdin">Program input</label>
+              <textarea id="codeStdin" class="code-stdin-input" spellcheck="false">Waffle</textarea>
+            </div>
+            <div class="codehub-action-row">
+              <button class="game-button game-button-coral" id="runCode">▶ RUN CODE</button>
+              <button class="game-button game-button-small" id="resetCode">RESET</button>
+            </div>
+          </section>
+
+          <section class="codehub-result-card">
+            <div class="codehub-result-heading">
+              <strong id="codeResultTitle">Live preview</strong>
+              <span id="codeRunTime">Browser sandbox</span>
+            </div>
+            <iframe class="code-preview" id="codePreview" title="CodeHub web preview" sandbox="allow-scripts"></iframe>
+            <div class="code-console-wrap" id="codeConsoleWrap">
+              <span class="console-label">Console</span>
+              <pre class="code-console" id="codeConsole" aria-live="polite">Ready.</pre>
+            </div>
+          </section>
+        </div>
+      </div>
+    `;
+  }
+
+  function loadCodeHubScript(path, globalReady) {
+    if (globalReady()) return Promise.resolve();
+    if (codeHubRuntimeState.scriptPromises.has(path)) return codeHubRuntimeState.scriptPromises.get(path);
+    const promise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = new URL(path, document.baseURI).href;
+      script.async = true;
+      script.addEventListener("load", () => (globalReady() ? resolve() : reject(new Error(`Runtime did not start: ${path}`))), { once: true });
+      script.addEventListener("error", () => reject(new Error(`Could not load ${path}`)), { once: true });
+      document.head.append(script);
+    }).catch((error) => {
+      codeHubRuntimeState.scriptPromises.delete(path);
+      throw error;
+    });
+    codeHubRuntimeState.scriptPromises.set(path, promise);
+    return promise;
+  }
+
+  async function getPyodideRuntime(onStatus) {
+    if (window.pyodide) return window.pyodide;
+    if (!codeHubRuntimeState.pyodidePromise) {
+      codeHubRuntimeState.pyodidePromise = (async () => {
+        onStatus("Loading Pyodide…", 0.16, "loading");
+        await loadCodeHubScript("vendor/pyodide/pyodide.js", () => typeof window.loadPyodide === "function");
+        onStatus("Preparing Python…", 0.5, "loading");
+        const pyodide = await window.loadPyodide({
+          indexURL: new URL("vendor/pyodide/", document.baseURI).href,
+        });
+        window.pyodide = pyodide;
+        return pyodide;
+      })().catch((error) => {
+        codeHubRuntimeState.pyodidePromise = null;
+        throw error;
+      });
+    }
+    return codeHubRuntimeState.pyodidePromise;
+  }
+
+  async function getClangCompiler(language, onStatus) {
+    if (codeHubRuntimeState.compilers.has(language)) return codeHubRuntimeState.compilers.get(language);
+    const promise = (async () => {
+      onStatus("Loading Clang WASM…", 0.08, "loading");
+      await loadCodeHubScript("vendor/clang/clang-wasm.global.js", () => Boolean(window.clangWasm?.createCompiler));
+      const baseUrl = new URL("vendor/clang/", document.baseURI);
+      return window.clangWasm.createCompiler(language, {
+        baseUrl,
+        std: language === "cpp" ? "gnu++20" : "gnu17",
+        onProgress: (value) => onStatus(`Loading Clang WASM… ${Math.round(value * 100)}%`, Math.max(0.08, value), "loading"),
+      });
+    })().catch((error) => {
+      codeHubRuntimeState.compilers.delete(language);
+      throw error;
+    });
+    codeHubRuntimeState.compilers.set(language, promise);
+    return promise;
+  }
+
+  function initCodeHub(root) {
+    const editor = root.querySelector("#codeEditor");
+    const stdinWrap = root.querySelector("#codeStdinWrap");
+    const stdin = root.querySelector("#codeStdin");
+    const webFileTabs = root.querySelector("#webFileTabs");
+    const fileName = root.querySelector("#codeFileName");
+    const languagePill = root.querySelector("#codeLanguagePill");
+    const runtimeLabel = root.querySelector("#codeRuntimeLabel");
+    const runtimeDot = root.querySelector("#codeRuntimeDot");
+    const runtimeProgress = root.querySelector("#runtimeProgressBar");
+    const runButton = root.querySelector("#runCode");
+    const resetButton = root.querySelector("#resetCode");
+    const preview = root.querySelector("#codePreview");
+    const consoleOutput = root.querySelector("#codeConsole");
+    const resultTitle = root.querySelector("#codeResultTitle");
+    const runTime = root.querySelector("#codeRunTime");
+    const consoleWrap = root.querySelector("#codeConsoleWrap");
+    const sources = {
+      web: { ...codeHubTemplates.web },
+      python: codeHubTemplates.python,
+      c: codeHubTemplates.c,
+      cpp: codeHubTemplates.cpp,
+    };
+    const fileNames = { html: "index.html", css: "style.css", js: "script.js" };
+    const languageNames = { web: "WEB TRIO", python: "PYTHON", c: "C · WASM", cpp: "C++ · WASM" };
+    const channel = `codehub-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    let language = "web";
+    let webFile = "html";
+    let previewTimer = null;
+    let running = false;
+
+    function setStatus(message, progress = 1, state = "ready") {
+      if (!root.isConnected) return;
+      runtimeLabel.textContent = message;
+      runtimeDot.className = `runtime-dot ${state}`;
+      runtimeProgress.style.width = `${Math.max(0, Math.min(1, progress)) * 100}%`;
+    }
+
+    function saveEditor() {
+      if (language === "web") sources.web[webFile] = editor.value;
+      else sources[language] = editor.value;
+    }
+
+    function updateEditor() {
+      editor.value = language === "web" ? sources.web[webFile] : sources[language];
+      fileName.textContent = language === "web" ? fileNames[webFile] : language === "python" ? "main.py" : language === "c" ? "main.c" : "main.cpp";
+      languagePill.textContent = languageNames[language];
+    }
+
+    function writeConsole(text, tone = "normal") {
+      consoleOutput.textContent = text || "Program finished with no output.";
+      consoleOutput.dataset.tone = tone;
+      consoleWrap.scrollTop = consoleWrap.scrollHeight;
+    }
+
+    function runWeb() {
+      saveEditor();
+      const logs = [];
+      writeConsole("Running in the browser…");
+      const safeJavaScript = sources.web.js.replace(/<\/script/gi, "<\\/script");
+      const bridge = `
+        const __send = (type, values) => parent.postMessage({ source: 'codehub-preview', channel: ${JSON.stringify(channel)}, type, text: values.map(value => {
+          try { return typeof value === 'object' ? JSON.stringify(value) : String(value); }
+          catch { return String(value); }
+        }).join(' ') }, '*');
+        ['log', 'info', 'warn', 'error'].forEach(type => {
+          const original = console[type];
+          console[type] = (...values) => { __send(type, values); original.apply(console, values); };
+        });
+        window.addEventListener('error', event => __send('error', [event.message]));
+      `;
+      preview.srcdoc = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${sources.web.css}</style></head><body>${sources.web.html}<script>${bridge}${safeJavaScript}<\/script></body></html>`;
+      writeConsole(logs.length ? logs.join("\n") : "Preview ready. Console messages will appear here.");
+      setStatus("Your browser · ready", 1, "ready");
+      runTime.textContent = "Browser sandbox";
+    }
+
+    const previewMessageHandler = (event) => {
+      if (event.source !== preview.contentWindow || event.data?.source !== "codehub-preview" || event.data.channel !== channel) return;
+      const prefix = event.data.type === "error" ? "Error: " : event.data.type === "warn" ? "Warning: " : "";
+      const previous = consoleOutput.textContent.includes("Preview ready") ? "" : `${consoleOutput.textContent}\n`;
+      writeConsole(`${previous}${prefix}${event.data.text}`, event.data.type === "error" ? "error" : "normal");
+    };
+    window.addEventListener("message", previewMessageHandler);
+    addCleanup(() => window.removeEventListener("message", previewMessageHandler));
+
+    async function runPython() {
+      const started = performance.now();
+      const output = [];
+      setStatus("Loading Pyodide…", 0.1, "loading");
+      const pyodide = await getPyodideRuntime(setStatus);
+      const inputs = stdin.value.replace(/\r/g, "").split("\n");
+      pyodide.setStdout({ batched: (text) => output.push(text) });
+      pyodide.setStderr({ batched: (text) => output.push(text) });
+      pyodide.setStdin({ stdin: () => (inputs.length ? inputs.shift() : null) });
+      setStatus("Pyodide · running", 0.86, "loading");
+      const result = await pyodide.runPythonAsync(sources.python);
+      if (result !== undefined && result !== null && String(result) !== "None") output.push(String(result));
+      if (result && typeof result.destroy === "function") result.destroy();
+      writeConsole(output.join("\n"));
+      setStatus("Pyodide · ready", 1, "ready");
+      runTime.textContent = `Python · ${Math.round(performance.now() - started)} ms`;
+    }
+
+    async function runClang(languageId) {
+      const started = performance.now();
+      setStatus("Loading Clang WASM…", 0.05, "loading");
+      const compiler = await getClangCompiler(languageId, setStatus);
+      setStatus(`Clang WASM · compiling ${languageId === "cpp" ? "C++" : "C"}`, 0.92, "loading");
+      const result = await compiler.run(sources[languageId], stdin.value, {
+        std: languageId === "cpp" ? "gnu++20" : "gnu17",
+      });
+      const text = result.exitCode === null ? result.errors.join("\n") : result.output;
+      writeConsole(text, result.exitCode === null || result.exitCode !== 0 ? "error" : "normal");
+      setStatus("Clang WASM · ready", 1, result.exitCode === null ? "error" : "ready");
+      runTime.textContent = result.exitCode === null
+        ? "Compile stopped"
+        : `Compile ${Math.round(result.compileMs)} ms · Run ${Math.round(result.runMs || 0)} ms · Exit ${result.exitCode}`;
+      if (!text && result.exitCode === 0) writeConsole("Program finished with exit code 0.");
+      if (!Number.isFinite(result.compileMs)) runTime.textContent = `WASM run · ${Math.round(performance.now() - started)} ms`;
+    }
+
+    async function runCode() {
+      if (running) return;
+      saveEditor();
+      running = true;
+      runButton.disabled = true;
+      runButton.textContent = language === "web" ? "▶ REFRESHING" : "● RUNNING";
+      writeConsole(language === "web" ? "Refreshing preview…" : "Starting runtime…");
+      try {
+        if (language === "web") runWeb();
+        else if (language === "python") await runPython();
+        else await runClang(language);
+      } catch (error) {
+        writeConsole(error?.stack || error?.message || String(error), "error");
+        setStatus("Runtime needs attention", 1, "error");
+        runTime.textContent = "Run stopped";
+      } finally {
+        if (root.isConnected) {
+          running = false;
+          runButton.disabled = false;
+          runButton.textContent = "▶ RUN CODE";
+        }
+      }
+    }
+
+    function selectLanguage(nextLanguage) {
+      if (nextLanguage === language) return;
+      saveEditor();
+      language = nextLanguage;
+      root.querySelectorAll("[data-code-language]").forEach((button) => {
+        const active = button.dataset.codeLanguage === language;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-selected", String(active));
+      });
+      webFileTabs.hidden = language !== "web";
+      stdinWrap.hidden = language === "web";
+      preview.hidden = language !== "web";
+      resultTitle.textContent = language === "web" ? "Live preview" : "Program output";
+      consoleWrap.classList.toggle("console-large", language !== "web");
+      if (language === "web") {
+        setStatus("Your browser · ready", 1, "ready");
+        runTime.textContent = "Browser sandbox";
+      } else if (language === "python") {
+        setStatus(codeHubRuntimeState.pyodidePromise ? "Pyodide · warmed up" : "Pyodide · loads on first run", codeHubRuntimeState.pyodidePromise ? 1 : 0, codeHubRuntimeState.pyodidePromise ? "ready" : "idle");
+        runTime.textContent = "Python output";
+        writeConsole("Press RUN CODE to start Python in Pyodide.");
+      } else {
+        const warm = codeHubRuntimeState.compilers.has(language);
+        setStatus(warm ? "Clang WASM · warmed up" : "Clang WASM · loads on first run", warm ? 1 : 0, warm ? "ready" : "idle");
+        runTime.textContent = `${language === "cpp" ? "C++20" : "C17"} output`;
+        writeConsole(`Press RUN CODE to compile ${language === "cpp" ? "C++" : "C"} to WebAssembly.`);
+      }
+      updateEditor();
+      if (language === "web") runWeb();
+    }
+
+    root.querySelectorAll("[data-code-language]").forEach((button) => {
+      button.addEventListener("click", () => selectLanguage(button.dataset.codeLanguage));
+    });
+    root.querySelectorAll("[data-web-file]").forEach((button) => {
+      button.addEventListener("click", () => {
+        if (language !== "web" || button.dataset.webFile === webFile) return;
+        sources.web[webFile] = editor.value;
+        webFile = button.dataset.webFile;
+        root.querySelectorAll("[data-web-file]").forEach((tab) => {
+          const active = tab === button;
+          tab.classList.toggle("active", active);
+          tab.setAttribute("aria-selected", String(active));
+        });
+        updateEditor();
+      });
+    });
+    editor.addEventListener("input", () => {
+      if (language !== "web") return;
+      window.clearTimeout(previewTimer);
+      previewTimer = window.setTimeout(runWeb, 480);
+    });
+    runButton.addEventListener("click", runCode);
+    resetButton.addEventListener("click", () => {
+      if (language === "web") sources.web = { ...codeHubTemplates.web };
+      else sources[language] = codeHubTemplates[language];
+      updateEditor();
+      writeConsole("Starter code restored.");
+      if (language === "web") runWeb();
+    });
+    addCleanup(() => window.clearTimeout(previewTimer));
+    updateEditor();
+    runWeb();
   }
 })();
