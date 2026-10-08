@@ -28,6 +28,14 @@
   const overlayCurtain = document.querySelector("#overlayCurtain");
   const toast = document.querySelector("#toast");
   const confettiField = document.querySelector("#confettiField");
+  const openSettingsButton = document.querySelector("#openSettings");
+  const settingsOverlay = document.querySelector("#settingsOverlay");
+  const settingsCurtain = document.querySelector("#settingsCurtain");
+  const closeSettingsButton = document.querySelector("#closeSettings");
+  const mainColorInput = document.querySelector("#mainColor");
+  const accentColorInput = document.querySelector("#accentColor");
+  const lowDetailToggle = document.querySelector("#lowDetailToggle");
+  const resetSettingsButton = document.querySelector("#resetSettings");
 
   let activeCleanup = [];
   let activeCategoryKey = null;
@@ -119,6 +127,51 @@
       render: renderCodeHub,
       init: initCodeHub,
     },
+    json: {
+      title: "JSON Workshop",
+      category: "Coding & Developing",
+      categoryKey: "coding",
+      icon: "json",
+      color: "#c4add0",
+      render: renderJsonWorkshop,
+      init: initJsonWorkshop,
+    },
+    regex: {
+      title: "Regex Playground",
+      category: "Coding & Developing",
+      categoryKey: "coding",
+      icon: "regex",
+      color: "#f2c86f",
+      render: renderRegexPlayground,
+      init: initRegexPlayground,
+    },
+    codec: {
+      title: "Data Codec",
+      category: "Coding & Developing",
+      categoryKey: "coding",
+      icon: "codec",
+      color: "#e9947f",
+      render: renderDataCodec,
+      init: initDataCodec,
+    },
+    hash: {
+      title: "Hash Generator",
+      category: "Coding & Developing",
+      categoryKey: "coding",
+      icon: "hash",
+      color: "#abc89c",
+      render: renderHashGenerator,
+      init: initHashGenerator,
+    },
+    uuid: {
+      title: "UUID Forge",
+      category: "Coding & Developing",
+      categoryKey: "coding",
+      icon: "uuid",
+      color: "#9cbdd2",
+      render: renderUuidForge,
+      init: initUuidForge,
+    },
   };
 
   const categories = {
@@ -140,9 +193,106 @@
       speech: codingMascotSpeech,
       title: "Coding & Developing — Bite Sized Utilities",
       opening: "Opening Coding & Developing!",
-      ready: "CodeHub is ready!",
+      ready: "Dev tools are ready!",
     },
   };
+
+  const SETTINGS_KEY = "bite-sized-utilities-settings-v1";
+  const defaultSettings = {
+    main: "#c98550",
+    accent: "#efb94f",
+    lowDetail: false,
+  };
+  let settingsState = { ...defaultSettings };
+  let settingsReturnFocus = null;
+
+  function validHex(value, fallback) {
+    return /^#[0-9a-f]{6}$/i.test(String(value || "")) ? String(value).toLowerCase() : fallback;
+  }
+
+  function shadeHex(hex, amount) {
+    const value = Number.parseInt(hex.slice(1), 16);
+    const red = Math.max(0, Math.min(255, (value >> 16) + amount));
+    const green = Math.max(0, Math.min(255, ((value >> 8) & 255) + amount));
+    const blue = Math.max(0, Math.min(255, (value & 255) + amount));
+    return `#${[red, green, blue].map((channel) => Math.round(channel).toString(16).padStart(2, "0")).join("")}`;
+  }
+
+  function saveSettings() {
+    try {
+      window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(settingsState));
+    } catch {
+      // The game still works when storage is unavailable.
+    }
+  }
+
+  function applySettings(nextSettings, persist = true) {
+    settingsState = {
+      main: validHex(nextSettings.main, defaultSettings.main),
+      accent: validHex(nextSettings.accent, defaultSettings.accent),
+      lowDetail: Boolean(nextSettings.lowDetail),
+    };
+    const page = document.documentElement;
+    page.style.setProperty("--theme-main", settingsState.main);
+    page.style.setProperty("--theme-main-dark", shadeHex(settingsState.main, -58));
+    page.style.setProperty("--honey", settingsState.accent);
+    page.style.setProperty("--honey-dark", shadeHex(settingsState.accent, -55));
+    page.classList.toggle("low-detail", settingsState.lowDetail);
+    mainColorInput.value = settingsState.main;
+    accentColorInput.value = settingsState.accent;
+    lowDetailToggle.setAttribute("aria-pressed", String(settingsState.lowDetail));
+    lowDetailToggle.classList.toggle("active", settingsState.lowDetail);
+    lowDetailToggle.querySelector("strong").textContent = settingsState.lowDetail ? "Potato mode: ON" : "Potato mode";
+    document.querySelectorAll("[data-theme-preset]").forEach((button) => {
+      const [main, accent] = button.dataset.themePreset.toLowerCase().split(",");
+      button.classList.toggle("active", main === settingsState.main && accent === settingsState.accent);
+    });
+    if (persist) saveSettings();
+  }
+
+  function loadSettings() {
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(SETTINGS_KEY) || "null");
+      if (saved && typeof saved === "object") return { ...defaultSettings, ...saved };
+    } catch {
+      // Ignore broken or blocked storage and use cozy defaults.
+    }
+    return { ...defaultSettings };
+  }
+
+  function openSettings() {
+    settingsReturnFocus = document.activeElement;
+    settingsOverlay.classList.add("open");
+    settingsOverlay.setAttribute("aria-hidden", "false");
+    document.body.classList.add("drawer-open");
+    requestAnimationFrame(() => closeSettingsButton.focus({ preventScroll: true }));
+  }
+
+  function closeSettings() {
+    if (!settingsOverlay.classList.contains("open")) return;
+    settingsOverlay.classList.remove("open");
+    settingsOverlay.setAttribute("aria-hidden", "true");
+    if (!toolOverlay.classList.contains("open")) document.body.classList.remove("drawer-open");
+    if (settingsReturnFocus && document.contains(settingsReturnFocus)) settingsReturnFocus.focus({ preventScroll: true });
+  }
+
+  applySettings(loadSettings(), false);
+  openSettingsButton.addEventListener("click", openSettings);
+  settingsCurtain.addEventListener("click", closeSettings);
+  closeSettingsButton.addEventListener("click", closeSettings);
+  mainColorInput.addEventListener("input", () => applySettings({ ...settingsState, main: mainColorInput.value }));
+  accentColorInput.addEventListener("input", () => applySettings({ ...settingsState, accent: accentColorInput.value }));
+  lowDetailToggle.addEventListener("click", () => applySettings({ ...settingsState, lowDetail: !settingsState.lowDetail }));
+  resetSettingsButton.addEventListener("click", () => {
+    applySettings(defaultSettings);
+    showToast("Cozy defaults restored!");
+  });
+  document.querySelectorAll("[data-theme-preset]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const [main, accent] = button.dataset.themePreset.split(",");
+      applySettings({ ...settingsState, main, accent });
+    });
+  });
 
   function addCleanup(callback) {
     activeCleanup.push(callback);
@@ -180,7 +330,7 @@
     toolOverlay.setAttribute("aria-hidden", "false");
     document.body.classList.add("drawer-open");
     const category = categories[activeCategoryKey];
-    if (category) category.speech.textContent = toolKey === "codehub" ? "Let's make something!" : "Math snack time!";
+    if (category) category.speech.textContent = activeCategoryKey === "coding" ? "Let's build something!" : "Math snack time!";
 
     requestAnimationFrame(() => {
       if (toolToken !== activeToolToken || !toolOverlay.classList.contains("open")) return;
@@ -331,7 +481,9 @@
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
-      if (toolOverlay.classList.contains("open")) {
+      if (settingsOverlay.classList.contains("open")) {
+        closeSettings();
+      } else if (toolOverlay.classList.contains("open")) {
         closeTool();
       } else if (Object.values(categories).some((category) => !category.screen.hidden)) {
         returnHome();
@@ -1320,21 +1472,48 @@
     return `
       <div class="tool-layout">
         <div class="roman-parchment">
-          <div class="roman-inputs">
-            <div class="field-stack"><label for="romanA">Whole number A</label><input class="chunky-input" id="romanA" type="number" min="1" max="3999999" value="12345" /></div>
-            <span class="fraction-op" id="romanOpBadge">+</span>
-            <div class="field-stack"><label for="romanB">Whole number B</label><input class="chunky-input" id="romanB" type="number" min="1" max="3999999" value="678" /></div>
+          <div class="segmented" role="tablist" aria-label="Roman numeral conversion direction">
+            <button class="tab-button active" data-roman-mode="toRoman" aria-selected="true">Number → Roman</button>
+            <button class="tab-button" data-roman-mode="toNumber" aria-selected="false">Roman → Number</button>
           </div>
-          <div class="segmented fraction-ops" style="margin-top: 16px" aria-label="Roman numeral operation">
-            <button class="tab-button active" data-roman-op="add" aria-selected="true">+</button>
-            <button class="tab-button" data-roman-op="subtract" aria-selected="false">−</button>
-            <button class="tab-button" data-roman-op="multiply" aria-selected="false">×</button>
-            <button class="tab-button" data-roman-op="divide" aria-selected="false">÷</button>
+
+          <div class="vinculum-control">
+            <div>
+              <strong>Vinculum notation</strong>
+              <span>Overlines unlock numbers above 3,999</span>
+            </div>
+            <button class="vinculum-toggle" id="vinculumToggle" aria-pressed="false">
+              <span class="toggle-track" aria-hidden="true"><span></span></span>
+              <strong>OFF</strong>
+            </button>
           </div>
+
+          <div class="roman-converter-panel" id="romanNumberPanel">
+            <div class="field-stack">
+              <label for="romanNumberInput">Whole number</label>
+              <input class="chunky-input" id="romanNumberInput" type="number" min="1" max="3999999" value="2026" inputmode="numeric" />
+            </div>
+          </div>
+
+          <div class="roman-converter-panel" id="romanTextPanel" hidden>
+            <div class="field-stack">
+              <label for="romanTextInput">Roman numeral</label>
+              <input class="chunky-input roman-entry" id="romanTextInput" value="MMXXVI" autocomplete="off" spellcheck="false" autocapitalize="characters" />
+            </div>
+            <div class="vinculum-keypad" id="vinculumKeypad" hidden>
+              <span>Tap to add an overlined numeral</span>
+              <div>
+                ${["I", "V", "X", "L", "C", "D", "M"].map((letter) => `<button data-vinculum-letter="${letter}" aria-label="Insert overlined ${letter}"><span class="vinculum">${letter}</span></button>`).join("")}
+              </div>
+            </div>
+          </div>
+
+          <button class="game-button roman-convert-button" id="romanConvert">CONVERT</button>
+
           <div class="roman-display" aria-live="polite">
-            <span class="result-kicker" id="romanDecimal">13,023</span>
-            <strong class="roman-number" id="romanResult"></strong>
-            <span class="result-detail" id="romanMessage">An overline multiplies a numeral by 1,000.</span>
+            <span class="result-kicker" id="romanResultLabel">Roman numeral</span>
+            <strong class="roman-number" id="romanResult">MMXXVI</strong>
+            <span class="result-detail" id="romanMessage">Classic notation, with vinculums switched off.</span>
           </div>
         </div>
       </div>
@@ -1369,72 +1548,136 @@
     return result;
   }
 
-  function romanMarkup(number) {
-    if (number === 0) return "N";
-    const thousands = Math.floor(number / 1000);
-    const remainder = number % 1000;
-    const high = thousands ? `<span class="vinculum">${romanUnder4000(thousands)}</span>` : "";
-    return `${high}${romanUnder4000(remainder)}`;
+  function romanText(number, useVinculum) {
+    if (number < 1) return "";
+    if (number <= 3999) return romanUnder4000(number);
+    if (!useVinculum) return "";
+    const high = romanUnder4000(Math.floor(number / 1000));
+    const overlined = [...high].map((letter) => `${letter}\u0305`).join("");
+    return `${overlined}${romanUnder4000(number % 1000)}`;
+  }
+
+  function romanMarkup(number, useVinculum) {
+    if (number <= 3999) return romanUnder4000(number);
+    if (!useVinculum) return "";
+    const high = romanUnder4000(Math.floor(number / 1000));
+    const low = romanUnder4000(number % 1000);
+    return `<span class="vinculum">${high}</span>${low}`;
+  }
+
+  function parseRomanNumeral(raw, allowVinculum) {
+    const text = String(raw || "").normalize("NFD").toUpperCase().replace(/\s+/g, "");
+    if (!text) throw new Error("Enter a Roman numeral first.");
+    if (!/^(?:[IVXLCDM]\u0305?)+$/u.test(text)) throw new Error("Use only I, V, X, L, C, D, M, and optional overlines.");
+    if (!allowVinculum && text.includes("\u0305")) throw new Error("Switch vinculums on to read overlined numerals.");
+
+    const baseValues = { I: 1, V: 5, X: 10, L: 50, C: 100, D: 500, M: 1000 };
+    const tokens = [];
+    for (let index = 0; index < text.length; index += 1) {
+      const letter = text[index];
+      let value = baseValues[letter];
+      if (text[index + 1] === "\u0305") {
+        value *= 1000;
+        index += 1;
+      }
+      tokens.push(value);
+    }
+
+    let total = 0;
+    tokens.forEach((value, index) => {
+      total += value < (tokens[index + 1] || 0) ? -value : value;
+    });
+    if (total < 1 || total > 3999999) throw new Error("Roman numerals on this parchment range from 1 to 3,999,999.");
+    const canonical = romanText(total, allowVinculum);
+    if (canonical !== text) throw new Error(`Try the standard form: ${canonical || "turn vinculums on"}.`);
+    return total;
   }
 
   function initRomanCalculator(root) {
-    const inputA = root.querySelector("#romanA");
-    const inputB = root.querySelector("#romanB");
+    const numberPanel = root.querySelector("#romanNumberPanel");
+    const textPanel = root.querySelector("#romanTextPanel");
+    const numberInput = root.querySelector("#romanNumberInput");
+    const textInput = root.querySelector("#romanTextInput");
+    const toggle = root.querySelector("#vinculumToggle");
+    const keypad = root.querySelector("#vinculumKeypad");
     const result = root.querySelector("#romanResult");
-    const decimal = root.querySelector("#romanDecimal");
+    const resultLabel = root.querySelector("#romanResultLabel");
     const message = root.querySelector("#romanMessage");
-    const badge = root.querySelector("#romanOpBadge");
-    let operation = "add";
-    const symbols = { add: "+", subtract: "−", multiply: "×", divide: "÷" };
+    let mode = "toRoman";
+    let vinculums = false;
 
-    function update() {
-      const a = Number(inputA.value);
-      const b = Number(inputB.value);
-      if (!Number.isSafeInteger(a) || !Number.isSafeInteger(b)) {
-        result.textContent = "?";
-        decimal.textContent = "Whole numbers only";
-        message.textContent = "Use whole numbers from 1 to 3,999,999.";
-        return;
-      }
-      let answer;
-      if (operation === "add") answer = a + b;
-      if (operation === "subtract") answer = a - b;
-      if (operation === "multiply") answer = a * b;
-      if (operation === "divide") {
-        if (b === 0 || a % b !== 0) {
-          result.textContent = "?";
-          decimal.textContent = "No whole-number quotient";
-          message.textContent = "Roman numerals in this parchment use whole results.";
-          return;
-        }
-        answer = a / b;
-      }
-      if (!Number.isInteger(answer) || answer < 1 || answer > 3999999) {
-        result.textContent = "?";
-        decimal.textContent = "Outside the parchment";
-        message.textContent = "The result must stay between 1 and 3,999,999.";
-        return;
-      }
-      result.innerHTML = romanMarkup(answer);
-      result.setAttribute("aria-label", `Roman numeral for ${answer}`);
-      decimal.textContent = answer.toLocaleString();
-      message.textContent = answer >= 4000 ? "The overlined part is multiplied by 1,000." : "Classic Roman numeral notation.";
+    function showError(error) {
+      result.textContent = "?";
+      resultLabel.textContent = "Check the parchment";
+      message.textContent = error.message || String(error);
     }
 
-    [inputA, inputB].forEach((input) => input.addEventListener("input", update));
-    root.querySelectorAll("[data-roman-op]").forEach((button) => {
+    function convert() {
+      try {
+        if (mode === "toRoman") {
+          const number = Number(numberInput.value);
+          if (!Number.isSafeInteger(number) || number < 1) throw new Error("Enter a positive whole number.");
+          if (number > 3999999) throw new Error("The largest supported number is 3,999,999.");
+          if (number > 3999 && !vinculums) throw new Error("Switch vinculums on for numbers above 3,999.");
+          result.innerHTML = romanMarkup(number, vinculums);
+          result.setAttribute("aria-label", `Roman numeral for ${number}`);
+          resultLabel.textContent = "Roman numeral";
+          message.textContent = number > 3999 ? "The overlined part is multiplied by 1,000." : "Classic notation, with vinculums switched off.";
+        } else {
+          const number = parseRomanNumeral(textInput.value, vinculums);
+          result.textContent = number.toLocaleString("en-US");
+          result.setAttribute("aria-label", `${textInput.value} equals ${number}`);
+          resultLabel.textContent = "Whole number";
+          message.textContent = textInput.value.includes("\u0305") ? "Overlined symbols were multiplied by 1,000." : "Roman numeral converted to a number.";
+        }
+      } catch (error) {
+        showError(error);
+      }
+    }
+
+    function updateMode(nextMode) {
+      mode = nextMode;
+      root.querySelectorAll("[data-roman-mode]").forEach((button) => {
+        const active = button.dataset.romanMode === mode;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-selected", String(active));
+      });
+      numberPanel.hidden = mode !== "toRoman";
+      textPanel.hidden = mode !== "toNumber";
+      keypad.hidden = mode !== "toNumber" || !vinculums;
+      convert();
+    }
+
+    root.querySelectorAll("[data-roman-mode]").forEach((button) => {
+      button.addEventListener("click", () => updateMode(button.dataset.romanMode));
+    });
+    toggle.addEventListener("click", () => {
+      vinculums = !vinculums;
+      toggle.classList.toggle("active", vinculums);
+      toggle.setAttribute("aria-pressed", String(vinculums));
+      toggle.querySelector("strong").textContent = vinculums ? "ON" : "OFF";
+      keypad.hidden = mode !== "toNumber" || !vinculums;
+      convert();
+    });
+    root.querySelectorAll("[data-vinculum-letter]").forEach((button) => {
       button.addEventListener("click", () => {
-        operation = button.dataset.romanOp;
-        badge.textContent = symbols[operation];
-        root.querySelectorAll("[data-roman-op]").forEach((tab) => {
-          const active = tab === button;
-          tab.classList.toggle("active", active);
-          tab.setAttribute("aria-selected", String(active));
-        });
-        update();
+        const token = `${button.dataset.vinculumLetter}\u0305`;
+        const start = textInput.selectionStart ?? textInput.value.length;
+        const end = textInput.selectionEnd ?? start;
+        textInput.setRangeText(token, start, end, "end");
+        textInput.focus();
+        convert();
       });
     });
-    update();
+    root.querySelector("#romanConvert").addEventListener("click", convert);
+    numberInput.addEventListener("input", convert);
+    textInput.addEventListener("input", convert);
+    [numberInput, textInput].forEach((input) => {
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") convert();
+      });
+    });
+    updateMode("toRoman");
   }
 
   /* Number base converter */
@@ -1841,6 +2084,406 @@
     draw();
   }
 
+
+  /* Coding and developing utilities */
+  async function copyGameText(text, successMessage = "Copied!") {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const helper = document.createElement("textarea");
+      helper.value = text;
+      helper.style.position = "fixed";
+      helper.style.opacity = "0";
+      document.body.append(helper);
+      helper.select();
+      document.execCommand("copy");
+      helper.remove();
+    }
+    showToast(successMessage);
+  }
+
+  function renderJsonWorkshop() {
+    return `
+      <div class="tool-layout dev-tool-layout">
+        <div class="game-panel panel-lilac">
+          <div class="dev-tool-heading">
+            <div><h3>Shape your JSON</h3><p class="panel-note">Format, minify, sort, and validate without sending data anywhere.</p></div>
+            <span class="dev-local-badge">LOCAL</span>
+          </div>
+          <textarea class="chunky-textarea dev-code-input" id="jsonInput" spellcheck="false" aria-label="JSON input">{
+  "snack": "waffle",
+  "tools": ["format", "validate"],
+  "ready": true
+}</textarea>
+          <div class="button-row dev-action-row">
+            <button class="game-button" data-json-action="format">FORMAT</button>
+            <button class="game-button game-button-coral" data-json-action="minify">MINIFY</button>
+            <button class="game-button game-button-sage" data-json-action="sort">SORT KEYS</button>
+            <button class="game-button game-button-small" id="copyJson">COPY</button>
+          </div>
+        </div>
+        <div class="result-card dev-status-card" id="jsonStatus" aria-live="polite">
+          <span class="result-kicker">JSON status</span>
+          <strong class="result-big dev-status-title" id="jsonStatusTitle">Valid!</strong>
+          <span class="result-detail" id="jsonStatusDetail">3 top-level keys</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function initJsonWorkshop(root) {
+    const input = root.querySelector("#jsonInput");
+    const status = root.querySelector("#jsonStatus");
+    const title = root.querySelector("#jsonStatusTitle");
+    const detail = root.querySelector("#jsonStatusDetail");
+
+    function sortedJson(value) {
+      if (Array.isArray(value)) return value.map(sortedJson);
+      if (value && typeof value === "object") {
+        return Object.keys(value).sort().reduce((result, key) => {
+          result[key] = sortedJson(value[key]);
+          return result;
+        }, {});
+      }
+      return value;
+    }
+
+    function parse() {
+      try {
+        const value = JSON.parse(input.value);
+        status.classList.remove("dev-status-error");
+        title.textContent = "Valid!";
+        if (Array.isArray(value)) detail.textContent = `${value.length} item${value.length === 1 ? "" : "s"} in the top-level array`;
+        else if (value && typeof value === "object") {
+          const count = Object.keys(value).length;
+          detail.textContent = `${count} top-level key${count === 1 ? "" : "s"}`;
+        } else detail.textContent = `Top-level ${value === null ? "null" : typeof value}`;
+        return value;
+      } catch (error) {
+        status.classList.add("dev-status-error");
+        title.textContent = "Not valid yet";
+        detail.textContent = error.message;
+        return null;
+      }
+    }
+
+    input.addEventListener("input", parse);
+    root.querySelectorAll("[data-json-action]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const value = parse();
+        if (value === null) return;
+        if (button.dataset.jsonAction === "format") input.value = JSON.stringify(value, null, 2);
+        if (button.dataset.jsonAction === "minify") input.value = JSON.stringify(value);
+        if (button.dataset.jsonAction === "sort") input.value = JSON.stringify(sortedJson(value), null, 2);
+        parse();
+      });
+    });
+    root.querySelector("#copyJson").addEventListener("click", () => copyGameText(input.value, "JSON copied!"));
+    parse();
+  }
+
+  function renderRegexPlayground() {
+    return `
+      <div class="tool-layout dev-tool-layout">
+        <div class="game-panel">
+          <div class="field-stack">
+            <label for="regexPattern">Pattern</label>
+            <div class="regex-pattern-row"><span>/</span><input class="chunky-input" id="regexPattern" value="\\b[A-Z]\\w+" spellcheck="false" /><span>/</span></div>
+          </div>
+          <div class="regex-flags" aria-label="Regular expression flags">
+            <button class="tab-button active" data-regex-flag="g" aria-pressed="true">g · all</button>
+            <button class="tab-button" data-regex-flag="i" aria-pressed="false">i · ignore case</button>
+            <button class="tab-button" data-regex-flag="m" aria-pressed="false">m · multiline</button>
+          </div>
+          <div class="field-stack" style="margin-top:15px">
+            <label for="regexText">Test text</label>
+            <textarea class="chunky-textarea" id="regexText">Waffles are warm. CodeHub likes Python, JavaScript, and Cocoa.</textarea>
+          </div>
+          <p class="graph-error" id="regexError" role="status"></p>
+        </div>
+        <div class="game-panel panel-teal">
+          <div class="dev-tool-heading"><h3>Match board</h3><span class="dev-local-badge" id="regexCount">0 MATCHES</span></div>
+          <div class="regex-highlight" id="regexHighlight" aria-live="polite"></div>
+          <div class="regex-match-list" id="regexMatchList"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  function initRegexPlayground(root) {
+    const pattern = root.querySelector("#regexPattern");
+    const text = root.querySelector("#regexText");
+    const error = root.querySelector("#regexError");
+    const highlight = root.querySelector("#regexHighlight");
+    const list = root.querySelector("#regexMatchList");
+    const count = root.querySelector("#regexCount");
+    const flags = new Set(["g"]);
+
+    function draw() {
+      highlight.innerHTML = "";
+      list.innerHTML = "";
+      error.textContent = "";
+      try {
+        const expression = new RegExp(pattern.value, [...flags].join(""));
+        const source = text.value;
+        const matches = [];
+        if (flags.has("g")) {
+          let match;
+          while ((match = expression.exec(source)) !== null) {
+            matches.push(match);
+            if (match[0] === "") expression.lastIndex += 1;
+            if (matches.length >= 250) break;
+          }
+        } else {
+          const match = expression.exec(source);
+          if (match) matches.push(match);
+        }
+        let cursor = 0;
+        matches.forEach((match, index) => {
+          highlight.append(document.createTextNode(source.slice(cursor, match.index)));
+          const marked = document.createElement("mark");
+          marked.textContent = match[0] || "∅";
+          marked.title = `Match ${index + 1}`;
+          highlight.append(marked);
+          cursor = match.index + match[0].length;
+          const chip = document.createElement("span");
+          chip.textContent = `${index + 1}: ${match[0] || "empty match"}`;
+          list.append(chip);
+        });
+        highlight.append(document.createTextNode(source.slice(cursor)));
+        count.textContent = `${matches.length} MATCH${matches.length === 1 ? "" : "ES"}`;
+        if (!matches.length) {
+          const chip = document.createElement("span");
+          chip.textContent = "No matches yet";
+          list.append(chip);
+        }
+      } catch (caught) {
+        error.textContent = caught.message;
+        count.textContent = "PATTERN ERROR";
+        highlight.textContent = text.value;
+      }
+    }
+
+    root.querySelectorAll("[data-regex-flag]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const flag = button.dataset.regexFlag;
+        if (flags.has(flag)) flags.delete(flag);
+        else flags.add(flag);
+        button.classList.toggle("active", flags.has(flag));
+        button.setAttribute("aria-pressed", String(flags.has(flag)));
+        draw();
+      });
+    });
+    pattern.addEventListener("input", draw);
+    text.addEventListener("input", draw);
+    draw();
+  }
+
+  function renderDataCodec() {
+    return `
+      <div class="tool-layout dev-tool-layout">
+        <div class="game-panel panel-coral">
+          <div class="segmented" role="tablist" aria-label="Codec type">
+            <button class="tab-button active" data-codec-mode="base64" aria-selected="true">Base64</button>
+            <button class="tab-button" data-codec-mode="url" aria-selected="false">URL</button>
+          </div>
+          <div class="segmented codec-direction" role="tablist" aria-label="Codec direction">
+            <button class="tab-button active" data-codec-direction="encode" aria-selected="true">Encode</button>
+            <button class="tab-button" data-codec-direction="decode" aria-selected="false">Decode</button>
+          </div>
+          <div class="field-stack"><label for="codecInput">Input</label><textarea class="chunky-textarea" id="codecInput">Waffles + code = cozy!</textarea></div>
+          <button class="game-button" id="runCodec">ENCODE</button>
+          <p class="graph-error" id="codecError" role="status"></p>
+        </div>
+        <div class="game-panel panel-teal">
+          <div class="field-stack"><label for="codecOutput">Output</label><textarea class="chunky-textarea dev-output" id="codecOutput" readonly></textarea></div>
+          <div class="button-row dev-action-row">
+            <button class="game-button game-button-sage" id="swapCodec">⇄ USE AS INPUT</button>
+            <button class="game-button game-button-small" id="copyCodec">COPY</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function initDataCodec(root) {
+    const input = root.querySelector("#codecInput");
+    const output = root.querySelector("#codecOutput");
+    const error = root.querySelector("#codecError");
+    const runButton = root.querySelector("#runCodec");
+    let mode = "base64";
+    let direction = "encode";
+
+    function encodeBase64(value) {
+      const bytes = new TextEncoder().encode(value);
+      let binary = "";
+      bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+      return btoa(binary);
+    }
+
+    function decodeBase64(value) {
+      const binary = atob(value.replace(/\s+/g, ""));
+      const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+      return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    }
+
+    function run() {
+      try {
+        error.textContent = "";
+        if (mode === "base64") output.value = direction === "encode" ? encodeBase64(input.value) : decodeBase64(input.value);
+        else output.value = direction === "encode" ? encodeURIComponent(input.value) : decodeURIComponent(input.value);
+      } catch (caught) {
+        output.value = "";
+        error.textContent = caught.message || "That data could not be decoded.";
+      }
+    }
+
+    root.querySelectorAll("[data-codec-mode]").forEach((button) => {
+      button.addEventListener("click", () => {
+        mode = button.dataset.codecMode;
+        root.querySelectorAll("[data-codec-mode]").forEach((tab) => {
+          const active = tab === button;
+          tab.classList.toggle("active", active);
+          tab.setAttribute("aria-selected", String(active));
+        });
+        run();
+      });
+    });
+    root.querySelectorAll("[data-codec-direction]").forEach((button) => {
+      button.addEventListener("click", () => {
+        direction = button.dataset.codecDirection;
+        root.querySelectorAll("[data-codec-direction]").forEach((tab) => {
+          const active = tab === button;
+          tab.classList.toggle("active", active);
+          tab.setAttribute("aria-selected", String(active));
+        });
+        runButton.textContent = direction.toUpperCase();
+        run();
+      });
+    });
+    runButton.addEventListener("click", run);
+    root.querySelector("#swapCodec").addEventListener("click", () => {
+      input.value = output.value;
+      direction = direction === "encode" ? "decode" : "encode";
+      root.querySelectorAll("[data-codec-direction]").forEach((tab) => {
+        const active = tab.dataset.codecDirection === direction;
+        tab.classList.toggle("active", active);
+        tab.setAttribute("aria-selected", String(active));
+      });
+      runButton.textContent = direction.toUpperCase();
+      run();
+    });
+    root.querySelector("#copyCodec").addEventListener("click", () => copyGameText(output.value, "Encoded data copied!"));
+    run();
+  }
+
+  function renderHashGenerator() {
+    return `
+      <div class="tool-layout dev-tool-layout">
+        <div class="game-panel panel-sage">
+          <div class="segmented" aria-label="Hash algorithm">
+            <button class="tab-button active" data-hash-algorithm="SHA-256" aria-selected="true">SHA-256</button>
+            <button class="tab-button" data-hash-algorithm="SHA-384" aria-selected="false">SHA-384</button>
+            <button class="tab-button" data-hash-algorithm="SHA-512" aria-selected="false">SHA-512</button>
+          </div>
+          <div class="field-stack" style="margin-top:15px"><label for="hashInput">Text to hash</label><textarea class="chunky-textarea" id="hashInput">Bite Sized Utilities</textarea></div>
+          <button class="game-button" id="generateHash">GENERATE HASH</button>
+        </div>
+        <div class="result-card hash-result" aria-live="polite">
+          <span class="result-kicker" id="hashLabel">SHA-256 digest</span>
+          <output class="hash-output" id="hashOutput">Working…</output>
+          <button class="game-button game-button-small" id="copyHash">COPY HASH</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function initHashGenerator(root) {
+    const input = root.querySelector("#hashInput");
+    const output = root.querySelector("#hashOutput");
+    const label = root.querySelector("#hashLabel");
+    let algorithm = "SHA-256";
+
+    async function generate() {
+      try {
+        output.textContent = "Working…";
+        const bytes = new TextEncoder().encode(input.value);
+        const digest = await crypto.subtle.digest(algorithm, bytes);
+        output.textContent = [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+        label.textContent = `${algorithm} digest`;
+      } catch (error) {
+        output.textContent = error.message || "Hashing is unavailable in this browser.";
+      }
+    }
+
+    root.querySelectorAll("[data-hash-algorithm]").forEach((button) => {
+      button.addEventListener("click", () => {
+        algorithm = button.dataset.hashAlgorithm;
+        root.querySelectorAll("[data-hash-algorithm]").forEach((tab) => {
+          const active = tab === button;
+          tab.classList.toggle("active", active);
+          tab.setAttribute("aria-selected", String(active));
+        });
+        generate();
+      });
+    });
+    root.querySelector("#generateHash").addEventListener("click", generate);
+    root.querySelector("#copyHash").addEventListener("click", () => copyGameText(output.textContent, "Hash copied!"));
+    generate();
+  }
+
+  function renderUuidForge() {
+    return `
+      <div class="tool-layout dev-tool-layout">
+        <div class="game-panel panel-teal">
+          <h3>Forge UUID v4 tokens</h3>
+          <p class="panel-note">Cryptographically random identifiers, made locally in your browser.</p>
+          <div class="face-count-control uuid-count-control">
+            <button class="step-button" id="removeUuid" aria-label="Generate fewer UUIDs">−</button>
+            <strong class="face-count"><span id="uuidCount">3</span> UUIDs</strong>
+            <button class="step-button" id="addUuid" aria-label="Generate more UUIDs">+</button>
+          </div>
+          <button class="game-button" id="generateUuid" style="width:100%">FORGE NEW UUIDs</button>
+        </div>
+        <div class="game-panel panel-lilac">
+          <textarea class="chunky-textarea dev-output uuid-output" id="uuidOutput" readonly aria-label="Generated UUIDs"></textarea>
+          <button class="game-button game-button-small" id="copyUuid" style="width:100%;margin-top:12px">COPY ALL</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function initUuidForge(root) {
+    const countLabel = root.querySelector("#uuidCount");
+    const output = root.querySelector("#uuidOutput");
+    let count = 3;
+
+    function uuidV4() {
+      if (crypto.randomUUID) return crypto.randomUUID();
+      const bytes = crypto.getRandomValues(new Uint8Array(16));
+      bytes[6] = (bytes[6] & 15) | 64;
+      bytes[8] = (bytes[8] & 63) | 128;
+      const hex = [...bytes].map((byte) => byte.toString(16).padStart(2, "0"));
+      return `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-${hex.slice(6, 8).join("")}-${hex.slice(8, 10).join("")}-${hex.slice(10).join("")}`;
+    }
+
+    function generate() {
+      output.value = Array.from({ length: count }, uuidV4).join("\n");
+      countLabel.textContent = String(count);
+    }
+
+    root.querySelector("#removeUuid").addEventListener("click", () => {
+      count = Math.max(1, count - 1);
+      generate();
+    });
+    root.querySelector("#addUuid").addEventListener("click", () => {
+      count = Math.min(20, count + 1);
+      generate();
+    });
+    root.querySelector("#generateUuid").addEventListener("click", generate);
+    root.querySelector("#copyUuid").addEventListener("click", () => copyGameText(output.value, "UUIDs copied!"));
+    generate();
+  }
 
   /* CodeHub */
   const codeHubRuntimeState = {

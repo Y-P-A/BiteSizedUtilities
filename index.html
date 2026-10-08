@@ -74,6 +74,36 @@
         <path d="M7 70h82l-8 14H15Z" fill="#e78167" stroke="#4f2f23" stroke-width="6" stroke-linejoin="round" />
         <path d="M40 76h16" stroke="#fff1c9" stroke-width="4" stroke-linecap="round" />
       </symbol>
+      <symbol id="icon-json" viewBox="0 0 96 96">
+        <rect x="12" y="8" width="72" height="80" rx="17" fill="#d5b3d8" stroke="#4f2f23" stroke-width="6" />
+        <path d="M42 25c-9 0-10 5-10 12v4c0 5-3 7-7 7 4 0 7 2 7 7v4c0 7 1 12 10 12M54 25c9 0 10 5 10 12v4c0 5 3 7 7 7-4 0-7 2-7 7v4c0 7-1 12-10 12" fill="none" stroke="#4f2f23" stroke-width="7" stroke-linecap="round" />
+        <circle cx="48" cy="47" r="5" fill="#efb94f" stroke="#4f2f23" stroke-width="3" />
+      </symbol>
+      <symbol id="icon-regex" viewBox="0 0 96 96">
+        <rect x="8" y="15" width="80" height="66" rx="17" fill="#efb94f" stroke="#4f2f23" stroke-width="6" />
+        <path d="M24 38h20M34 28v20m-8-16 16 13M58 35h1m12 0h1M58 58c5 5 11 5 16 0" fill="none" stroke="#4f2f23" stroke-width="6" stroke-linecap="round" />
+        <path d="m54 25 24 24" stroke="#fff1cf" stroke-width="4" stroke-linecap="round" opacity=".9" />
+      </symbol>
+      <symbol id="icon-codec" viewBox="0 0 96 96">
+        <rect x="9" y="12" width="78" height="72" rx="18" fill="#e9947f" stroke="#4f2f23" stroke-width="6" />
+        <path d="M25 34h43l-8-8m8 8-8 8M71 61H28l8 8m-8-8 8-8" fill="none" stroke="#4f2f23" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+        <circle cx="23" cy="34" r="5" fill="#fff1cf" />
+        <circle cx="73" cy="61" r="5" fill="#fff1cf" />
+      </symbol>
+      <symbol id="icon-hash" viewBox="0 0 96 96">
+        <path d="M20 12h56a12 12 0 0 1 12 12v48a12 12 0 0 1-12 12H20A12 12 0 0 1 8 72V24a12 12 0 0 1 12-12Z" fill="#91b782" stroke="#4f2f23" stroke-width="6" />
+        <path d="m39 27-7 43m28-43-7 43M24 42h48M21 57h48" fill="none" stroke="#4f2f23" stroke-width="7" stroke-linecap="round" />
+      </symbol>
+      <symbol id="icon-uuid" viewBox="0 0 96 96">
+        <path d="M12 23a11 11 0 0 1 11-11h50a11 11 0 0 1 11 11v50a11 11 0 0 1-11 11H23a11 11 0 0 1-11-11Z" fill="#88aeca" stroke="#4f2f23" stroke-width="6" />
+        <path d="M27 31h15m12 0h15M27 48h8m12 0h22M27 65h22m12 0h8" stroke="#fff1cf" stroke-width="7" stroke-linecap="round" />
+        <circle cx="45" cy="31" r="4" fill="#efb94f" /><circle cx="39" cy="48" r="4" fill="#e78167" /><circle cx="55" cy="65" r="4" fill="#efb94f" />
+      </symbol>
+      <symbol id="icon-settings" viewBox="0 0 96 96">
+        <path d="m48 8 8 9 12-1 4 12 11 6-4 12 6 11-10 8-1 12-13 1-8 10-11-7-12 4-6-11-12-4 1-13-8-9 8-10-1-12 12-5 5-11 12 3Z" fill="#efb94f" stroke="#4f2f23" stroke-width="6" stroke-linejoin="round" />
+        <circle cx="48" cy="48" r="17" fill="#82b9b3" stroke="#4f2f23" stroke-width="6" />
+        <circle cx="48" cy="48" r="6" fill="#fff1cf" />
+      </symbol>
       <symbol id="icon-close" viewBox="0 0 48 48">
         <path d="m14 14 20 20m0-20L14 34" stroke="currentColor" stroke-width="7" stroke-linecap="round" />
       </symbol>
@@ -135,7 +165,7 @@
                     <div class="home-cupboard-inside">
                       <span class="home-inside-icon"><svg><use href="#icon-codehub"></use></svg></span>
                       <strong>Coding &amp; Developing</strong>
-                      <span>CodeHub is ready!</span>
+                      <span>6 tools ready!</span>
                       <span class="home-shelf-board" aria-hidden="true"></span>
                     </div>
                     <button class="home-cupboard-door" id="openCodingCupboard" aria-expanded="false" aria-label="Open the Coding and Developing cupboard">
@@ -144,7 +174,7 @@
                           <svg><use href="#icon-codehub"></use></svg>
                         </span>
                         <strong>Coding <span>&amp;</span><br />Developing</strong>
-                        <small>1 utility</small>
+                        <small>6 utilities</small>
                       </span>
                       <span class="home-door-knob" aria-hidden="true"></span>
                     </button>
@@ -276,15 +306,39 @@
       </header>
 
       <main class="category-cabinet-scene coding-cabinet-scene">
-        <section class="open-category-cabinet coding-category-cabinet" aria-label="Open Coding and Developing cupboard containing CodeHub">
+        <section class="open-category-cabinet coding-category-cabinet" aria-label="Open Coding and Developing cupboard containing six utilities">
           <div class="category-cabinet-crown" aria-hidden="true"></div>
           <div class="category-cabinet-frame">
             <div class="category-cabinet-back">
-              <div class="category-shelf category-shelf-single">
-                <button class="shelf-utility shelf-utility-featured" data-tool="codehub" aria-label="Open CodeHub">
+              <div class="category-shelf">
+                <button class="shelf-utility" data-tool="codehub" aria-label="Open CodeHub">
                   <span class="utility-art utility-art-code"><svg><use href="#icon-codehub"></use></svg></span>
                   <span>CodeHub</span>
                   <small>Web · Python · C · C++</small>
+                </button>
+                <button class="shelf-utility" data-tool="json" aria-label="Open JSON Workshop">
+                  <span class="utility-art utility-art-lilac"><svg><use href="#icon-json"></use></svg></span>
+                  <span>JSON<br />Workshop</span>
+                </button>
+              </div>
+              <div class="category-shelf">
+                <button class="shelf-utility" data-tool="regex" aria-label="Open Regex Playground">
+                  <span class="utility-art utility-art-honey"><svg><use href="#icon-regex"></use></svg></span>
+                  <span>Regex<br />Playground</span>
+                </button>
+                <button class="shelf-utility" data-tool="codec" aria-label="Open Data Codec">
+                  <span class="utility-art utility-art-coral"><svg><use href="#icon-codec"></use></svg></span>
+                  <span>Data Codec</span>
+                </button>
+              </div>
+              <div class="category-shelf">
+                <button class="shelf-utility" data-tool="hash" aria-label="Open Hash Generator">
+                  <span class="utility-art utility-art-sage"><svg><use href="#icon-hash"></use></svg></span>
+                  <span>Hash<br />Generator</span>
+                </button>
+                <button class="shelf-utility" data-tool="uuid" aria-label="Open UUID Forge">
+                  <span class="utility-art utility-art-teal"><svg><use href="#icon-uuid"></use></svg></span>
+                  <span>UUID Forge</span>
                 </button>
               </div>
             </div>
@@ -293,9 +347,60 @@
       </main>
 
       <button class="waffle-mascot waffle-cup-small" id="codingMascot" aria-label="Bounce the waffle cup mascot">
-        <span class="mascot-speech" id="codingMascotSpeech">CodeHub is ready!</span>
+        <span class="mascot-speech" id="codingMascotSpeech">Dev tools are ready!</span>
         <img src="assets/waffle-cup-mascot.webp" alt="A cheerful waffle cup filled with hot chocolate" />
       </button>
+    </div>
+
+    <button class="settings-launch" id="openSettings" aria-label="Open game settings">
+      <svg><use href="#icon-settings"></use></svg>
+      <span>Settings</span>
+    </button>
+
+    <div class="settings-overlay" id="settingsOverlay" aria-hidden="true">
+      <button class="settings-curtain" id="settingsCurtain" aria-label="Close settings"></button>
+      <section class="settings-card" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+        <header class="settings-header">
+          <span class="settings-heading-icon"><svg><use href="#icon-settings"></use></svg></span>
+          <div>
+            <p>Cozy controls</p>
+            <h2 id="settingsTitle">Game Settings</h2>
+          </div>
+          <button class="round-close" id="closeSettings" aria-label="Close settings">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </header>
+        <div class="settings-body">
+          <section class="settings-section">
+            <h3>Kitchen colors</h3>
+            <div class="color-setting-grid">
+              <label class="color-setting" for="mainColor">
+                <span><strong>Main color</strong><small>Signs and game panels</small></span>
+                <input id="mainColor" type="color" value="#c98550" />
+              </label>
+              <label class="color-setting" for="accentColor">
+                <span><strong>Accent color</strong><small>Buttons, knobs, and highlights</small></span>
+                <input id="accentColor" type="color" value="#efb94f" />
+              </label>
+            </div>
+            <div class="theme-presets" aria-label="Color presets">
+              <button data-theme-preset="#c98550,#efb94f" aria-label="Honey kitchen colors"><span style="background:#c98550"></span><span style="background:#efb94f"></span></button>
+              <button data-theme-preset="#c86f75,#f0bd69" aria-label="Berry kitchen colors"><span style="background:#c86f75"></span><span style="background:#f0bd69"></span></button>
+              <button data-theme-preset="#729b7b,#e9b85c" aria-label="Sage kitchen colors"><span style="background:#729b7b"></span><span style="background:#e9b85c"></span></button>
+              <button data-theme-preset="#658fa3,#e99a68" aria-label="Ocean kitchen colors"><span style="background:#658fa3"></span><span style="background:#e99a68"></span></button>
+              <button data-theme-preset="#91749b,#e7ac62" aria-label="Plum kitchen colors"><span style="background:#91749b"></span><span style="background:#e7ac62"></span></button>
+            </div>
+          </section>
+          <section class="settings-section">
+            <h3>Performance</h3>
+            <button class="detail-toggle" id="lowDetailToggle" aria-pressed="false">
+              <span class="detail-toggle-copy"><strong>Potato mode</strong><small>Fewer textures, shadows, and animations</small></span>
+              <span class="toggle-track" aria-hidden="true"><span></span></span>
+            </button>
+          </section>
+          <button class="game-button settings-reset" id="resetSettings">RESET SETTINGS</button>
+        </div>
+      </section>
     </div>
 
     <div class="tool-overlay" id="toolOverlay" aria-hidden="true">
