@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A cozy 2.5D kitchen cupboard filled with playful math and number utilities."
+    />
+    <title>Math &amp; Numbers — Bite Sized Utilities</title>
+    <link rel="icon" href="assets/waffle-mascot-cutout.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <svg class="svg-sprite" aria-hidden="true">
+      <symbol id="icon-calculator" viewBox="0 0 96 96">
+        <rect x="17" y="8" width="62" height="80" rx="15" fill="#e78167" stroke="#4f2f23" stroke-width="6" />
+        <rect x="27" y="19" width="42" height="18" rx="6" fill="#fff1c9" stroke="#4f2f23" stroke-width="5" />
+        <path d="M32 51h6m13 0h6m13 0h1M32 64h6m13 0h6m13 0h1M32 77h6m13 0h6m13 0h1" stroke="#4f2f23" stroke-width="8" stroke-linecap="round" />
+      </symbol>
+      <symbol id="icon-graph" viewBox="0 0 96 96">
+        <rect x="9" y="12" width="78" height="70" rx="14" fill="#82bbb6" stroke="#4f2f23" stroke-width="6" />
+        <path d="M24 23v45h54M24 56h54M24 41h54M41 23v45M59 23v45" fill="none" stroke="#fff0cb" stroke-width="3" opacity=".9" />
+        <path d="M25 64c10-2 13-20 23-19 10 2 10 13 18 10 7-3 8-22 14-25" fill="none" stroke="#b84f42" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+      </symbol>
+      <symbol id="icon-body" viewBox="0 0 96 96">
+        <path d="M20 83c0-19 11-31 28-31s28 12 28 31" fill="#91b783" stroke="#4f2f23" stroke-width="6" stroke-linecap="round" />
+        <circle cx="48" cy="27" r="17" fill="#f3b26d" stroke="#4f2f23" stroke-width="6" />
+        <path d="M39 26h2m14 0h2M40 35c5 4 11 4 16 0" fill="none" stroke="#4f2f23" stroke-width="4" stroke-linecap="round" />
+        <path d="M48 59c-9-9-20 3-10 13l10 9 10-9c10-10-1-22-10-13Z" fill="#db6f65" stroke="#4f2f23" stroke-width="4" />
+      </symbol>
+      <symbol id="icon-fraction" viewBox="0 0 96 96">
+        <rect x="18" y="10" width="60" height="76" rx="16" fill="#c6a8ca" stroke="#4f2f23" stroke-width="6" />
+        <path d="M30 49h36" stroke="#4f2f23" stroke-width="6" stroke-linecap="round" />
+        <circle cx="48" cy="30" r="9" fill="#fff1c9" stroke="#4f2f23" stroke-width="4" />
+        <path d="M41 69h14" stroke="#fff1c9" stroke-width="10" stroke-linecap="round" />
+      </symbol>
+      <symbol id="icon-percent" viewBox="0 0 96 96">
+        <path d="M12 25a14 14 0 0 1 14-14h42l17 17-40 54a13 13 0 0 1-18 2L12 72Z" fill="#f0b84f" stroke="#4f2f23" stroke-width="6" stroke-linejoin="round" />
+        <circle cx="61" cy="27" r="6" fill="#fff1c9" stroke="#4f2f23" stroke-width="4" />
+        <path d="M31 67 62 38M32 42h1m28 23h1" stroke="#4f2f23" stroke-width="8" stroke-linecap="round" />
+      </symbol>
+      <symbol id="icon-dice" viewBox="0 0 96 96">
+        <path d="m19 27 27-15 31 13-27 17Z" fill="#f7d98f" stroke="#4f2f23" stroke-width="6" stroke-linejoin="round" />
+        <path d="m19 27 31 15v40L18 66Z" fill="#df7964" stroke="#4f2f23" stroke-width="6" stroke-linejoin="round" />
+        <path d="m50 42 27-17 1 41-28 16Z" fill="#83b4ad" stroke="#4f2f23" stroke-width="6" stroke-linejoin="round" />
+        <path d="M32 42h1m4 23h1m26-26h1m0 26h1M45 25h1" stroke="#4f2f23" stroke-width="7" stroke-linecap="round" />
+      </symbol>
+      <symbol id="icon-roman" viewBox="0 0 96 96">
+        <path d="M18 13c15 5 28-5 41 0 9 3 14 1 19-1v70c-11 5-21 2-29 0-11-3-20 4-31 0Z" fill="#efd39b" stroke="#4f2f23" stroke-width="6" stroke-linejoin="round" />
+        <path d="M31 29h34M34 66h28" stroke="#b77c49" stroke-width="4" stroke-linecap="round" />
+        <path d="m31 38 10 24 8-24m5 0v24m-5-24h12" fill="none" stroke="#4f2f23" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+      </symbol>
+      <symbol id="icon-base" viewBox="0 0 96 96">
+        <rect x="7" y="14" width="35" height="31" rx="10" fill="#82bbb6" stroke="#4f2f23" stroke-width="5" />
+        <rect x="54" y="51" width="35" height="31" rx="10" fill="#e78167" stroke="#4f2f23" stroke-width="5" />
+        <path d="M48 24h21l-7-7m7 7-7 7M48 72H27l7 7m-7-7 7-7" fill="none" stroke="#4f2f23" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M19 26h11M68 63v9m-5-4h10" stroke="#fff1c9" stroke-width="6" stroke-linecap="round" />
+      </symbol>
+      <symbol id="icon-prime" viewBox="0 0 96 96">
+        <path d="m48 7 11 23 25 4-18 18 4 26-22-12-22 12 4-26-18-18 25-4Z" fill="#efba4f" stroke="#4f2f23" stroke-width="6" stroke-linejoin="round" />
+        <path d="M39 33h20L47 64" fill="none" stroke="#4f2f23" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+      </symbol>
+      <symbol id="icon-sequence" viewBox="0 0 96 96">
+        <rect x="8" y="25" width="25" height="48" rx="8" fill="#e78167" stroke="#4f2f23" stroke-width="5" />
+        <rect x="36" y="16" width="25" height="57" rx="8" fill="#f0ba50" stroke="#4f2f23" stroke-width="5" />
+        <rect x="64" y="7" width="25" height="66" rx="8" fill="#83b4ad" stroke="#4f2f23" stroke-width="5" />
+        <path d="M17 59h7M44 57h9M72 55h9" stroke="#fff1c9" stroke-width="6" stroke-linecap="round" />
+      </symbol>
+      <symbol id="icon-close" viewBox="0 0 48 48">
+        <path d="m14 14 20 20m0-20L14 34" stroke="currentColor" stroke-width="7" stroke-linecap="round" />
+      </symbol>
+    </svg>
+
+    <div class="game-world" id="gameWorld">
+      <button class="waffle-backdrop" id="waffleBackdrop" aria-label="Bounce the waffle wall"></button>
+
+      <header class="kitchen-header">
+        <div class="hanging-rope hanging-rope-left" aria-hidden="true"></div>
+        <div class="hanging-rope hanging-rope-right" aria-hidden="true"></div>
+        <div class="title-sign">
+          <span class="title-doodle" aria-hidden="true">×</span>
+          <div>
+            <p>Open a cupboard. Pick up a tool.</p>
+            <h1>Math <span>&amp;</span> Numbers</h1>
+          </div>
+          <span class="title-doodle" aria-hidden="true">÷</span>
+        </div>
+      </header>
+
+      <main class="kitchen-main">
+        <section class="cupboard-wall" aria-label="Math and Numbers cupboards">
+          <article class="cupboard cupboard-coral" data-cupboard>
+            <div class="cupboard-top" aria-hidden="true"></div>
+            <div class="cupboard-frame">
+              <div class="cupboard-inside">
+                <div class="utility-row">
+                  <button class="utility-object" data-tool="calculator" aria-label="Open Calculator">
+                    <span class="utility-art utility-art-coral"><svg><use href="#icon-calculator"></use></svg></span>
+                    <span>Calculator</span>
+                  </button>
+                  <button class="utility-object" data-tool="fraction" aria-label="Open Fraction Calculator">
+                    <span class="utility-art utility-art-lilac"><svg><use href="#icon-fraction"></use></svg></span>
+                    <span>Fraction<br />Calculator</span>
+                  </button>
+                </div>
+                <div class="shelf-board" aria-hidden="true"></div>
+                <button class="cupboard-close" aria-label="Close Quick Counts cupboard">
+                  <svg><use href="#icon-close"></use></svg>
+                </button>
+              </div>
+              <button class="cupboard-door" aria-expanded="false">
+                <span class="door-inset">
+                  <svg class="door-icon"><use href="#icon-calculator"></use></svg>
+                  <span class="door-label">Quick Counts</span>
+                </span>
+                <span class="door-knob" aria-hidden="true"></span>
+              </button>
+            </div>
+          </article>
+
+          <article class="cupboard cupboard-sage" data-cupboard>
+            <div class="cupboard-top" aria-hidden="true"></div>
+            <div class="cupboard-frame">
+              <div class="cupboard-inside">
+                <div class="utility-row">
+                  <button class="utility-object" data-tool="graph" aria-label="Open Graphing Calculator">
+                    <span class="utility-art utility-art-teal"><svg><use href="#icon-graph"></use></svg></span>
+                    <span>Graphing<br />Calculator</span>
+                  </button>
+                  <button class="utility-object" data-tool="body" aria-label="Open Bodily Calculator">
+                    <span class="utility-art utility-art-sage"><svg><use href="#icon-body"></use></svg></span>
+                    <span>Bodily<br />Calculator</span>
+                  </button>
+                </div>
+                <div class="shelf-board" aria-hidden="true"></div>
+                <button class="cupboard-close" aria-label="Close Curves and Measures cupboard">
+                  <svg><use href="#icon-close"></use></svg>
+                </button>
+              </div>
+              <button class="cupboard-door" aria-expanded="false">
+                <span class="door-inset">
+                  <svg class="door-icon"><use href="#icon-graph"></use></svg>
+                  <span class="door-label">Curves &amp; Measures</span>
+                </span>
+                <span class="door-knob" aria-hidden="true"></span>
+              </button>
+            </div>
+          </article>
+
+          <article class="cupboard cupboard-honey" data-cupboard>
+            <div class="cupboard-top" aria-hidden="true"></div>
+            <div class="cupboard-frame">
+              <div class="cupboard-inside">
+                <div class="utility-row">
+                  <button class="utility-object" data-tool="percentage" aria-label="Open Percentage Calculator">
+                    <span class="utility-art utility-art-honey"><svg><use href="#icon-percent"></use></svg></span>
+                    <span>Percentage<br />Calculator</span>
+                  </button>
+                  <button class="utility-object" data-tool="dice" aria-label="Open Dice Roller">
+                    <span class="utility-art utility-art-teal"><svg><use href="#icon-dice"></use></svg></span>
+                    <span>Dice Roller</span>
+                  </button>
+                </div>
+                <div class="shelf-board" aria-hidden="true"></div>
+                <button class="cupboard-close" aria-label="Close Deals and Dice cupboard">
+                  <svg><use href="#icon-close"></use></svg>
+                </button>
+              </div>
+              <button class="cupboard-door" aria-expanded="false">
+                <span class="door-inset">
+                  <svg class="door-icon"><use href="#icon-dice"></use></svg>
+                  <span class="door-label">Deals &amp; Dice</span>
+                </span>
+                <span class="door-knob" aria-hidden="true"></span>
+              </button>
+            </div>
+          </article>
+
+          <article class="cupboard cupboard-lilac" data-cupboard>
+            <div class="cupboard-top" aria-hidden="true"></div>
+            <div class="cupboard-frame">
+              <div class="cupboard-inside">
+                <div class="utility-row">
+                  <button class="utility-object" data-tool="roman" aria-label="Open Roman Numeral Calculator">
+                    <span class="utility-art utility-art-parchment"><svg><use href="#icon-roman"></use></svg></span>
+                    <span>Roman Numeral<br />Calculator</span>
+                  </button>
+                  <button class="utility-object" data-tool="base" aria-label="Open Number Base Converter">
+                    <span class="utility-art utility-art-coral"><svg><use href="#icon-base"></use></svg></span>
+                    <span>Number Base<br />Converter</span>
+                  </button>
+                </div>
+                <div class="shelf-board" aria-hidden="true"></div>
+                <button class="cupboard-close" aria-label="Close Number Languages cupboard">
+                  <svg><use href="#icon-close"></use></svg>
+                </button>
+              </div>
+              <button class="cupboard-door" aria-expanded="false">
+                <span class="door-inset">
+                  <svg class="door-icon"><use href="#icon-roman"></use></svg>
+                  <span class="door-label">Number Languages</span>
+                </span>
+                <span class="door-knob" aria-hidden="true"></span>
+              </button>
+            </div>
+          </article>
+
+          <article class="cupboard cupboard-teal" data-cupboard>
+            <div class="cupboard-top" aria-hidden="true"></div>
+            <div class="cupboard-frame">
+              <div class="cupboard-inside cupboard-inside-single">
+                <div class="utility-row">
+                  <button class="utility-object utility-object-wide" data-tool="prime" aria-label="Open Prime Number Checker">
+                    <span class="utility-art utility-art-honey"><svg><use href="#icon-prime"></use></svg></span>
+                    <span>Prime Number<br />Checker</span>
+                  </button>
+                </div>
+                <div class="shelf-board" aria-hidden="true"></div>
+                <button class="cupboard-close" aria-label="Close Prime Pantry cupboard">
+                  <svg><use href="#icon-close"></use></svg>
+                </button>
+              </div>
+              <button class="cupboard-door" aria-expanded="false">
+                <span class="door-inset">
+                  <svg class="door-icon"><use href="#icon-prime"></use></svg>
+                  <span class="door-label">Prime Pantry</span>
+                </span>
+                <span class="door-knob" aria-hidden="true"></span>
+              </button>
+            </div>
+          </article>
+
+          <article class="cupboard cupboard-blue" data-cupboard>
+            <div class="cupboard-top" aria-hidden="true"></div>
+            <div class="cupboard-frame">
+              <div class="cupboard-inside cupboard-inside-single">
+                <div class="utility-row">
+                  <button class="utility-object utility-object-wide" data-tool="sequence" aria-label="Open Sequence Playground">
+                    <span class="utility-art utility-art-sage"><svg><use href="#icon-sequence"></use></svg></span>
+                    <span>Sequence<br />Playground</span>
+                  </button>
+                </div>
+                <div class="shelf-board" aria-hidden="true"></div>
+                <button class="cupboard-close" aria-label="Close Sequence Shelf cupboard">
+                  <svg><use href="#icon-close"></use></svg>
+                </button>
+              </div>
+              <button class="cupboard-door" aria-expanded="false">
+                <span class="door-inset">
+                  <svg class="door-icon"><use href="#icon-sequence"></use></svg>
+                  <span class="door-label">Sequence Shelf</span>
+                </span>
+                <span class="door-knob" aria-hidden="true"></span>
+              </button>
+            </div>
+          </article>
+        </section>
+      </main>
+
+      <button class="waffle-mascot" id="waffleMascot" aria-label="Bounce the waffle mascot">
+        <span class="mascot-speech" id="mascotSpeech">Tap a cupboard!</span>
+        <img src="assets/waffle-mascot-cutout.png" alt="A cheerful waffle holding a pencil" />
+      </button>
+    </div>
+
+    <div class="tool-overlay" id="toolOverlay" aria-hidden="true">
+      <button class="overlay-curtain" id="overlayCurtain" aria-label="Close utility"></button>
+      <section class="tool-drawer" role="dialog" aria-modal="true" aria-labelledby="toolTitle">
+        <div class="drawer-handle" aria-hidden="true"></div>
+        <header class="tool-header">
+          <div class="tool-heading-icon" id="toolHeadingIcon"></div>
+          <div class="tool-heading-copy">
+            <p>Math &amp; Numbers</p>
+            <h2 id="toolTitle"></h2>
+          </div>
+          <button class="round-close" id="closeTool" aria-label="Back to cupboards">
+            <svg><use href="#icon-close"></use></svg>
+          </button>
+        </header>
+        <div class="tool-body" id="toolBody"></div>
+      </section>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="confetti-field" id="confettiField" aria-hidden="true"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
