@@ -3111,8 +3111,7 @@ int main() {
               <span class="code-language-pill" id="codeLanguagePill">WEB TRIO</span>
             </div>
             <textarea class="code-editor" id="codeEditor" aria-label="Code editor" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
-            <div class="codehub-stdin" id="codeStdinWrap" hidden></div>
-            <div class="codehub-action-row">
+            <div class="codehub-action-row" id="codeHubActions">
               <button class="game-button game-button-coral" id="runCode">▶ RUN CODE</button>
               <button class="game-button game-button-small" id="resetCode">RESET</button>
             </div>
@@ -3193,7 +3192,7 @@ int main() {
 
   function initCodeHub(root) {
     const editor = root.querySelector("#codeEditor");
-    const stdinWrap = root.querySelector("#codeStdinWrap");
+    const actionRow = root.querySelector("#codeHubActions");
     const webFileTabs = root.querySelector("#webFileTabs");
     const fileName = root.querySelector("#codeFileName");
     const languagePill = root.querySelector("#codeLanguagePill");
@@ -3220,17 +3219,21 @@ int main() {
     let webFile = "html";
     let previewTimer = null;
     let running = false;
+    let stdinWrap = null;
     let stdin = null;
     let programInput = "Waffle";
 
     function updateProgramInputControl() {
       if (stdin) programInput = stdin.value;
-      stdinWrap.replaceChildren();
+      if (stdinWrap) stdinWrap.remove();
+      stdinWrap = null;
       stdin = null;
       const usesProgramInput = language === "c" || language === "cpp";
-      stdinWrap.hidden = !usesProgramInput;
       if (!usesProgramInput) return;
 
+      stdinWrap = document.createElement("div");
+      stdinWrap.id = "codeStdinWrap";
+      stdinWrap.className = "codehub-stdin";
       const label = document.createElement("label");
       label.htmlFor = "codeStdin";
       label.textContent = `${language === "cpp" ? "C++" : "C"} program input`;
@@ -3240,6 +3243,7 @@ int main() {
       input.spellcheck = false;
       input.value = programInput;
       stdinWrap.append(label, input);
+      actionRow.before(stdinWrap);
       stdin = input;
     }
 
