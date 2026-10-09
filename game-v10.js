@@ -233,6 +233,78 @@
       render: () => window.TextFilesTools.renderTextFilters(),
       init: (root) => window.TextFilesTools.initTextFilters(root, { showToast, copyGameText }),
     },
+    wordcounter: {
+      title: "Word Counter",
+      category: "Text & Files",
+      categoryKey: "text",
+      icon: "wordcount",
+      color: "#9cbdd2",
+      render: () => window.TextFilesExtras.wordcounter.render(),
+      init: (root) => window.TextFilesExtras.wordcounter.init(root),
+    },
+    findreplace: {
+      title: "Find & Replace",
+      category: "Text & Files",
+      categoryKey: "text",
+      icon: "findreplace",
+      color: "#e9947f",
+      render: () => window.TextFilesExtras.findreplace.render(),
+      init: (root) => window.TextFilesExtras.findreplace.init(root, { showToast, copyGameText }),
+    },
+    notes: {
+      title: "Fridge Notes",
+      category: "Text & Files",
+      categoryKey: "text",
+      icon: "notes",
+      color: "#f2c86f",
+      render: () => window.TextFilesExtras.notes.render(),
+      init: (root) => window.TextFilesExtras.notes.init(root),
+    },
+    bakery: {
+      title: "Placeholder Bakery",
+      category: "Text & Files",
+      categoryKey: "text",
+      icon: "bakery",
+      color: "#abc89c",
+      render: () => window.TextFilesExtras.bakery.render(),
+      init: (root) => window.TextFilesExtras.bakery.init(root, { showToast, copyGameText }),
+    },
+    qrsticker: {
+      title: "QR Sticker",
+      category: "Text & Files",
+      categoryKey: "text",
+      icon: "qr",
+      color: "#9ccbc4",
+      render: () => window.TextFilesExtras.qrsticker.render(),
+      init: (root) => window.TextFilesExtras.qrsticker.init(root),
+    },
+    emoji: {
+      title: "Emoji Pantry",
+      category: "Text & Files",
+      categoryKey: "text",
+      icon: "emoji",
+      color: "#c4add0",
+      render: () => window.TextFilesExtras.emoji.render(),
+      init: (root) => window.TextFilesExtras.emoji.init(root, { showToast, copyGameText }),
+    },
+    typing: {
+      title: "Typing Taste Test",
+      category: "Text & Files",
+      categoryKey: "text",
+      icon: "typing",
+      color: "#e9947f",
+      render: () => window.TextFilesExtras.typing.render(),
+      init: (root) => window.TextFilesExtras.typing.init(root),
+    },
+    speedread: {
+      title: "Speed Reader",
+      category: "Text & Files",
+      categoryKey: "text",
+      icon: "speedread",
+      color: "#9cbdd2",
+      render: () => window.TextFilesExtras.speedread.render(),
+      init: (root) => window.TextFilesExtras.speedread.init(root),
+    },
   };
 
   const categories = {
@@ -396,7 +468,7 @@
     toolBody.innerHTML = tool.render();
     toolBody.scrollTop = 0;
     toolOverlay.classList.toggle("codehub-open", toolKey === "codehub");
-    toolOverlay.classList.toggle("workbench-open", toolKey === "fileconverter" || toolKey === "textfilters");
+    toolOverlay.classList.toggle("workbench-open", tools[toolKey]?.categoryKey === "text");
 
     toolOverlay.classList.add("open");
     toolOverlay.setAttribute("aria-hidden", "false");

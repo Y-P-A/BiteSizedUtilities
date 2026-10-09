@@ -4728,9 +4728,9 @@ html.low-detail .home-cupboard-door {
   align-self: stretch;
   width: 100%;
   max-width: none;
-  min-height: 150px;
-  padding: 7px 4px 27px;
-  font-size: clamp(0.8rem, 3.4vw, 1.05rem);
+  min-height: 128px;
+  padding: 5px 2px 25px;
+  font-size: clamp(0.67rem, 3vw, 0.9rem);
 }
 
 .text-category-cabinet .shelf-utility::before {
@@ -4749,15 +4749,15 @@ html.low-detail .home-cupboard-door {
 }
 
 .text-category-cabinet .shelf-utility .utility-art {
-  width: clamp(66px, 19vw, 100px);
-  height: clamp(66px, 19vw, 100px);
-  margin-bottom: 8px;
+  width: clamp(54px, 16vw, 82px);
+  height: clamp(54px, 16vw, 82px);
+  margin-bottom: 7px;
 }
 
 .text-category-cabinet .shelf-utility small {
   display: block;
-  margin-top: 4px;
-  font-size: clamp(0.56rem, 2.3vw, 0.72rem);
+  margin-top: 3px;
+  font-size: clamp(0.52rem, 2.1vw, 0.66rem);
   letter-spacing: 0.06em;
   color: var(--cream);
   opacity: 0.92;
@@ -5137,5 +5137,328 @@ html.low-detail .home-cupboard-door {
 
   .text-filter-grid {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+}
+
+/* ===== Text & Files: ten tools (v10) ===== */
+.utility-art-blue {
+  background: #88aeca;
+}
+
+.game-panel.panel-honey {
+  background: var(--parchment);
+}
+
+.extra-stack-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 18px;
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.extra-tall-textarea {
+  min-height: 260px;
+}
+
+.stat-chip-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+  gap: 8px;
+}
+
+.stat-chip {
+  display: grid;
+  gap: 2px;
+  padding: 9px 8px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  background: var(--cream);
+  box-shadow: 0 4px 0 rgba(63, 34, 23, 0.2);
+  text-align: center;
+}
+
+.stat-chip strong {
+  font-size: 1.05rem;
+}
+
+.stat-chip span {
+  font-size: 0.62rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.top-words-heading {
+  margin-top: 14px;
+}
+
+/* Find & Replace */
+.findreplace-rules {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.findreplace-rule {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.findreplace-flag {
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  padding: 6px 8px;
+  border: 3px solid var(--ink);
+  border-radius: 12px;
+  background: var(--cream);
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.findreplace-flag input {
+  accent-color: var(--coral-dark);
+}
+
+/* Fridge notes */
+.fridge-layout {
+  display: grid;
+  gap: 16px;
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.fridge-toolbar {
+  display: grid;
+  gap: 10px;
+}
+
+.fridge-toolbar .game-button {
+  justify-self: start;
+}
+
+.fridge-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px;
+  padding: 18px;
+  border: 4px solid var(--ink);
+  border-radius: 24px;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.07) 0 2px, transparent 2px 26px),
+    linear-gradient(180deg, #f7fbfa, #dcebe8);
+  box-shadow: inset 0 8px 0 rgba(255, 255, 255, 0.5), 0 8px 0 rgba(63, 34, 23, 0.22);
+}
+
+.fridge-note {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  min-height: 170px;
+  padding: 26px 12px 12px;
+  border: 3px solid var(--ink);
+  border-radius: 6px 6px 14px 6px;
+  box-shadow: 0 7px 0 rgba(63, 34, 23, 0.24);
+  transform: rotate(-1deg);
+}
+
+.fridge-note:nth-child(even) {
+  transform: rotate(1.2deg);
+}
+
+.fridge-note textarea {
+  width: 100%;
+  height: 100%;
+  min-height: 110px;
+  border: none;
+  background: transparent;
+  resize: none;
+  font: inherit;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--ink);
+  outline: none;
+}
+
+.fridge-note-honey { background: #ffe9ae; }
+.fridge-note-coral { background: #ffd2c6; }
+.fridge-note-sage { background: #d9ecc9; }
+.fridge-note-teal { background: #cdeae6; }
+.fridge-note-lilac { background: #e4d6ea; }
+
+.fridge-note-magnet {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 22px;
+  height: 22px;
+  transform: translateX(-50%);
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: var(--coral);
+  box-shadow: 0 3px 0 rgba(63, 34, 23, 0.3);
+}
+
+.fridge-note .fridge-note-delete {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 30px;
+  height: 30px;
+  font-size: 0.8rem;
+  background: var(--cream);
+  box-shadow: 0 3px 0 rgba(63, 34, 23, 0.3);
+}
+
+.fridge-note .fridge-note-delete svg, .round-mini-button svg { width: 16px; height: 16px; }
+
+/* Placeholder bakery */
+.bakery-custom-input {
+  min-height: 74px;
+  resize: vertical;
+}
+
+/* QR sticker */
+.qr-layout {
+  align-items: start;
+}
+
+.qr-preview-panel {
+  justify-items: center;
+  gap: 12px;
+}
+
+.qr-sticker-frame {
+  padding: 12px;
+  border: 4px solid var(--ink);
+  border-radius: 20px;
+  background: #fff8e7;
+  box-shadow: 0 7px 0 rgba(63, 34, 23, 0.24);
+  transform: rotate(-1.4deg);
+}
+
+.qr-sticker-frame canvas {
+  display: block;
+  max-width: min(320px, 70vw);
+  height: auto;
+  border-radius: 8px;
+  image-rendering: pixelated;
+}
+
+/* Emoji pantry */
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+  gap: 7px;
+  max-height: 330px;
+  overflow: auto;
+  margin-top: 12px;
+  padding: 10px;
+  border: 3px solid var(--ink);
+  border-radius: 18px;
+  background: rgba(255, 241, 207, 0.65);
+}
+
+.emoji-jar {
+  display: grid;
+  place-items: center;
+  height: 50px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: var(--cream);
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(63, 34, 23, 0.22);
+  transition: transform 0.12s ease, background-color 0.12s ease;
+}
+
+.emoji-jar:hover {
+  transform: translateY(-2px) rotate(-2deg);
+  background: #fff7de;
+}
+
+.emoji-jar:active {
+  transform: scale(0.9);
+}
+
+.emoji-plate-panel {
+  justify-items: center;
+  gap: 12px;
+}
+
+.emoji-plate {
+  display: grid;
+  place-items: center;
+  width: min(240px, 60vw);
+  height: 170px;
+  border: 4px dashed var(--ink);
+  border-radius: 24px;
+  background: var(--cream);
+  font-size: 5rem;
+}
+
+/* Typing taste test */
+.typing-target {
+  padding: 14px;
+  border: 3px solid var(--ink);
+  border-radius: 18px;
+  background: var(--cream);
+  font-size: 1.06rem;
+  letter-spacing: 0.02em;
+  line-height: 1.7;
+  box-shadow: inset 0 5px 0 rgba(255, 255, 255, 0.5);
+}
+
+.typing-char.ok { color: var(--sage-dark); }
+.typing-char.bad { color: var(--coral-dark); background: #ffd2c6; border-radius: 4px; }
+
+.typing-input {
+  margin-top: 12px;
+  min-height: 64px;
+}
+
+/* Speed reader */
+.speedreader-panel {
+  justify-items: center;
+  gap: 14px;
+}
+
+.speedreader-stage {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 130px;
+  border: 4px solid var(--ink);
+  border-radius: 22px;
+  background: #503427;
+  box-shadow: inset 0 8px 0 rgba(0, 0, 0, 0.25);
+}
+
+.speedreader-stage span {
+  font-size: clamp(1.6rem, 5vw, 2.6rem);
+  letter-spacing: 0.04em;
+  color: var(--cream);
+}
+
+.speedreader-stage .orp {
+  color: var(--honey);
+}
+
+@media (max-width: 940px) {
+  .extra-stack-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .findreplace-rule {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .findreplace-rule .findreplace-flag {
+    justify-self: start;
   }
 }
