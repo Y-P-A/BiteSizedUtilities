@@ -1533,6 +1533,25 @@ body.waffle-wall-bounce .waffle-backdrop {
   margin-bottom: 7px;
 }
 
+.shelf-new-badge {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  right: 3px;
+  padding: 4px 6px;
+  border: 2px solid var(--ink);
+  border-radius: 9px;
+  background: var(--honey);
+  color: var(--ink);
+  box-shadow: 0 3px 0 var(--honey-dark);
+  font-size: 0.5rem;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-shadow: none;
+  text-transform: uppercase;
+  transform: rotate(4deg);
+}
+
 @media (hover: hover) and (pointer: fine) {
   .shelf-utility:hover {
     transform: translateY(-8px) scale(1.035);

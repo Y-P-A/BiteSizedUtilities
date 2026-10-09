@@ -3111,10 +3111,7 @@ int main() {
               <span class="code-language-pill" id="codeLanguagePill">WEB TRIO</span>
             </div>
             <textarea class="code-editor" id="codeEditor" aria-label="Code editor" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
-            <div class="codehub-stdin" id="codeStdinWrap" hidden>
-              <label for="codeStdin">C / C++ program input</label>
-              <textarea id="codeStdin" class="code-stdin-input" spellcheck="false">Waffle</textarea>
-            </div>
+            <div class="codehub-stdin" id="codeStdinWrap" hidden></div>
             <div class="codehub-action-row">
               <button class="game-button game-button-coral" id="runCode">▶ RUN CODE</button>
               <button class="game-button game-button-small" id="resetCode">RESET</button>
@@ -3197,7 +3194,6 @@ int main() {
   function initCodeHub(root) {
     const editor = root.querySelector("#codeEditor");
     const stdinWrap = root.querySelector("#codeStdinWrap");
-    const stdin = root.querySelector("#codeStdin");
     const webFileTabs = root.querySelector("#webFileTabs");
     const fileName = root.querySelector("#codeFileName");
     const languagePill = root.querySelector("#codeLanguagePill");
@@ -3224,6 +3220,28 @@ int main() {
     let webFile = "html";
     let previewTimer = null;
     let running = false;
+    let stdin = null;
+    let programInput = "Waffle";
+
+    function updateProgramInputControl() {
+      if (stdin) programInput = stdin.value;
+      stdinWrap.replaceChildren();
+      stdin = null;
+      const usesProgramInput = language === "c" || language === "cpp";
+      stdinWrap.hidden = !usesProgramInput;
+      if (!usesProgramInput) return;
+
+      const label = document.createElement("label");
+      label.htmlFor = "codeStdin";
+      label.textContent = `${language === "cpp" ? "C++" : "C"} program input`;
+      const input = document.createElement("textarea");
+      input.id = "codeStdin";
+      input.className = "code-stdin-input";
+      input.spellcheck = false;
+      input.value = programInput;
+      stdinWrap.append(label, input);
+      stdin = input;
+    }
 
     function setStatus(message, progress = 1, state = "ready") {
       if (!root.isConnected) return;
@@ -3311,7 +3329,8 @@ __bite_builtins.input = __bite_browser_input`;
       setStatus("Loading Clang WASM…", 0.05, "loading");
       const compiler = await getClangCompiler(languageId, setStatus);
       setStatus(`Clang WASM · compiling ${languageId === "cpp" ? "C++" : "C"}`, 0.92, "loading");
-      const result = await compiler.run(sources[languageId], stdin.value, {
+      if (stdin) programInput = stdin.value;
+      const result = await compiler.run(sources[languageId], programInput, {
         std: languageId === "cpp" ? "gnu++20" : "gnu17",
       });
       const text = result.exitCode === null ? result.errors.join("\n") : result.output;
@@ -3358,7 +3377,7 @@ __bite_builtins.input = __bite_browser_input`;
         button.setAttribute("aria-selected", String(active));
       });
       webFileTabs.hidden = language !== "web";
-      stdinWrap.hidden = language === "web" || language === "python";
+      updateProgramInputControl();
       preview.hidden = language !== "web";
       resultTitle.textContent = language === "web" ? "Live preview" : "Program output";
       consoleWrap.classList.toggle("console-large", language !== "web");
@@ -3367,8 +3386,8 @@ __bite_builtins.input = __bite_browser_input`;
         runTime.textContent = "Browser sandbox";
       } else if (language === "python") {
         setStatus(codeHubRuntimeState.pyodidePromise ? "Pyodide · warmed up" : "Pyodide · loads on first run", codeHubRuntimeState.pyodidePromise ? 1 : 0, codeHubRuntimeState.pyodidePromise ? "ready" : "idle");
-        runTime.textContent = "Python output";
-        writeConsole("Press RUN CODE to start Python in Pyodide.");
+        runTime.textContent = "Python · native input dialogs";
+        writeConsole("Press RUN CODE. Python input() opens a native browser dialog.");
       } else {
         const warm = codeHubRuntimeState.compilers.has(language);
         setStatus(warm ? "Clang WASM · warmed up" : "Clang WASM · loads on first run", warm ? 1 : 0, warm ? "ready" : "idle");
