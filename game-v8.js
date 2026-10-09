@@ -7,18 +7,25 @@
   const homeMascotSpeech = document.querySelector("#homeMascotSpeech");
   const mathHomeCupboard = document.querySelector("#mathHomeCupboard");
   const codingHomeCupboard = document.querySelector("#codingHomeCupboard");
+  const textHomeCupboard = document.querySelector("#textHomeCupboard");
   const openMathCupboard = document.querySelector("#openMathCupboard");
   const openCodingCupboard = document.querySelector("#openCodingCupboard");
+  const openTextCupboard = document.querySelector("#openTextCupboard");
   const backHomeButton = document.querySelector("#backHome");
   const backHomeCodingButton = document.querySelector("#backHomeCoding");
+  const backHomeTextButton = document.querySelector("#backHomeText");
   const gameWorld = document.querySelector("#gameWorld");
   const codingWorld = document.querySelector("#codingWorld");
+  const textWorld = document.querySelector("#textWorld");
   const waffleBackdrop = document.querySelector("#waffleBackdrop");
   const codingWaffleBackdrop = document.querySelector("#codingWaffleBackdrop");
+  const textWaffleBackdrop = document.querySelector("#textWaffleBackdrop");
   const waffleMascot = document.querySelector("#waffleMascot");
   const codingMascot = document.querySelector("#codingMascot");
+  const textMascot = document.querySelector("#textMascot");
   const mascotSpeech = document.querySelector("#mascotSpeech");
   const codingMascotSpeech = document.querySelector("#codingMascotSpeech");
+  const textMascotSpeech = document.querySelector("#textMascotSpeech");
   const toolOverlay = document.querySelector("#toolOverlay");
   const toolBody = document.querySelector("#toolBody");
   const toolTitle = document.querySelector("#toolTitle");
@@ -208,6 +215,24 @@
       render: renderTimestampLab,
       init: initTimestampLab,
     },
+    fileconverter: {
+      title: "File Converter",
+      category: "Text & Files",
+      categoryKey: "text",
+      icon: "files",
+      color: "#9cbdd2",
+      render: () => window.TextFilesTools.renderFileConverter(),
+      init: (root) => window.TextFilesTools.initFileConverter(root, { showToast, addCleanup }),
+    },
+    textfilters: {
+      title: "Crazy Text Filters",
+      category: "Text & Files",
+      categoryKey: "text",
+      icon: "textfilters",
+      color: "#c4add0",
+      render: () => window.TextFilesTools.renderTextFilters(),
+      init: (root) => window.TextFilesTools.initTextFilters(root, { showToast, copyGameText }),
+    },
   };
 
   const categories = {
@@ -230,6 +255,16 @@
       title: "Coding & Developing — Bite Sized Utilities",
       opening: "Opening Coding & Developing!",
       ready: "Dev tools are ready!",
+    },
+    text: {
+      homeCupboard: textHomeCupboard,
+      door: openTextCupboard,
+      screen: textWorld,
+      mascot: textMascot,
+      speech: textMascotSpeech,
+      title: "Text & Files — Bite Sized Utilities",
+      opening: "Opening Text & Files!",
+      ready: "Pick a file trick!",
     },
   };
 
@@ -361,12 +396,16 @@
     toolBody.innerHTML = tool.render();
     toolBody.scrollTop = 0;
     toolOverlay.classList.toggle("codehub-open", toolKey === "codehub");
+    toolOverlay.classList.toggle("workbench-open", toolKey === "fileconverter" || toolKey === "textfilters");
 
     toolOverlay.classList.add("open");
     toolOverlay.setAttribute("aria-hidden", "false");
     document.body.classList.add("drawer-open");
     const category = categories[activeCategoryKey];
-    if (category) category.speech.textContent = activeCategoryKey === "coding" ? "Let's build something!" : "Math snack time!";
+    if (category) {
+      const messages = { math: "Math snack time!", coding: "Let's build something!", text: "Remix time!" };
+      category.speech.textContent = messages[activeCategoryKey] || category.ready;
+    }
 
     requestAnimationFrame(() => {
       if (toolToken !== activeToolToken || !toolOverlay.classList.contains("open")) return;
@@ -386,7 +425,7 @@
     if (category) category.speech.textContent = category.ready;
     drawerClearTimer = window.setTimeout(() => {
       toolBody.innerHTML = "";
-      toolOverlay.classList.remove("codehub-open");
+      toolOverlay.classList.remove("codehub-open", "workbench-open");
     }, 500);
     if (lastFocusedElement && document.contains(lastFocusedElement)) {
       lastFocusedElement.focus({ preventScroll: true });
@@ -465,7 +504,7 @@
         item.homeCupboard.classList.remove("open");
         item.door.setAttribute("aria-expanded", "false");
       });
-      homeMascotSpeech.textContent = "Two cupboards are ready!";
+      homeMascotSpeech.textContent = "Three cupboards are ready!";
       homeScreen.hidden = false;
       homeScreen.setAttribute("aria-hidden", "false");
       homeScreen.classList.remove("screen-leaving");
@@ -482,13 +521,15 @@
   });
   homeMascot.addEventListener("click", () => {
     bounceWall();
-    bounceHomeMascot("Math or code? Pick a cupboard!");
+    bounceHomeMascot("Numbers, code, text, or files?");
   });
   homeMascot.addEventListener("animationend", () => homeMascot.classList.remove("bouncing"));
   openMathCupboard.addEventListener("click", () => enterCategory("math"));
   openCodingCupboard.addEventListener("click", () => enterCategory("coding"));
+  openTextCupboard.addEventListener("click", () => enterCategory("text"));
   backHomeButton.addEventListener("click", returnHome);
   backHomeCodingButton.addEventListener("click", returnHome);
+  backHomeTextButton.addEventListener("click", returnHome);
 
   document.addEventListener("click", (event) => {
     const button = event.target.closest("[data-tool]");
@@ -505,6 +546,10 @@
     bounceWall();
     bounceCategoryMascot("coding", "Boing!");
   });
+  textWaffleBackdrop.addEventListener("click", () => {
+    bounceWall();
+    bounceCategoryMascot("text", "Boing!");
+  });
   waffleMascot.addEventListener("click", () => {
     bounceWall();
     bounceCategoryMascot("math", "Ready to crunch numbers!");
@@ -513,8 +558,13 @@
     bounceWall();
     bounceCategoryMascot("coding", "Ready to run code!");
   });
+  textMascot.addEventListener("click", () => {
+    bounceWall();
+    bounceCategoryMascot("text", "Ready to remix files!");
+  });
   waffleMascot.addEventListener("animationend", () => waffleMascot.classList.remove("bouncing"));
   codingMascot.addEventListener("animationend", () => codingMascot.classList.remove("bouncing"));
+  textMascot.addEventListener("animationend", () => textMascot.classList.remove("bouncing"));
   closeToolButton.addEventListener("click", closeTool);
   overlayCurtain.addEventListener("click", closeTool);
 

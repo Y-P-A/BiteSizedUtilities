@@ -12,7 +12,7 @@
     />
     <title>Bite Sized Utilities</title>
     <link rel="icon" href="assets/waffle-cup-mascot.webp" />
-    <link rel="stylesheet" href="game-v7.css" />
+    <link rel="stylesheet" href="game-v8.css" />
   </head>
   <body>
     <svg class="svg-sprite" aria-hidden="true">
@@ -125,6 +125,17 @@
         <path d="M25 12 15 23m56-11 10 11" stroke="#82b9b3" stroke-width="7" stroke-linecap="round" />
         <circle cx="48" cy="49" r="5" fill="#e78167" />
       </symbol>
+      <symbol id="icon-files" viewBox="0 0 96 96">
+        <path d="M18 9h39l18 18v51a9 9 0 0 1-9 9H18a9 9 0 0 1-9-9V18a9 9 0 0 1 9-9Z" fill="#88aeca" stroke="#4f2f23" stroke-width="6" stroke-linejoin="round" />
+        <path d="M57 9v19h18" fill="#fff1cf" stroke="#4f2f23" stroke-width="5" stroke-linejoin="round" />
+        <path d="M24 42h28m-28 13h19m-19 13h25" stroke="#fff1cf" stroke-width="6" stroke-linecap="round" />
+        <path d="m59 51 9-9 9 9m-9-9v27m9-8-9 9-9-9" fill="none" stroke="#efb94f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+      </symbol>
+      <symbol id="icon-textfilters" viewBox="0 0 96 96">
+        <rect x="8" y="13" width="80" height="70" rx="18" fill="#c4add0" stroke="#4f2f23" stroke-width="6" />
+        <path d="M22 35h31M28 62l12-29 12 29M32 52h16" fill="none" stroke="#fff1cf" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="m68 28 3 7 8 2-7 4 1 8-6-5-7 4 3-8-6-5 8 1Zm-3 29 2 5 6 1-5 3 1 6-5-4-5 3 2-6-4-4 6 1Z" fill="#efb94f" stroke="#4f2f23" stroke-width="3" stroke-linejoin="round" />
+      </symbol>
       <symbol id="icon-settings" viewBox="0 0 96 96">
         <path d="m48 8 8 9 12-1 4 12 11 6-4 12 6 11-10 8-1 12-13 1-8 10-11-7-12 4-6-11-12-4 1-13-8-9 8-10-1-12 12-5 5-11 12 3Z" fill="#efb94f" stroke="#4f2f23" stroke-width="6" stroke-linejoin="round" />
         <circle cx="48" cy="48" r="17" fill="#82b9b3" stroke="#4f2f23" stroke-width="6" />
@@ -207,11 +218,36 @@
                   </div>
                 </div>
               </div>
+
+              <div class="home-category-slot home-category-slot-text">
+                <div class="home-cupboard home-cupboard-text" id="textHomeCupboard">
+                  <div class="home-cupboard-crown" aria-hidden="true"></div>
+                  <div class="home-cupboard-frame">
+                    <div class="home-cupboard-inside">
+                      <span class="home-inside-icon"><svg><use href="#icon-files"></use></svg></span>
+                      <strong>Text &amp; Files</strong>
+                      <span>2 tools ready!</span>
+                      <span class="home-shelf-board" aria-hidden="true"></span>
+                    </div>
+                    <button class="home-cupboard-door" id="openTextCupboard" aria-expanded="false" aria-label="Open the Text and Files cupboard">
+                      <span class="home-door-inset">
+                        <span class="home-door-icons" aria-hidden="true">
+                          <svg><use href="#icon-files"></use></svg>
+                          <svg><use href="#icon-textfilters"></use></svg>
+                        </span>
+                        <strong>Text <span>&amp;</span><br />Files</strong>
+                        <small>2 utilities</small>
+                      </span>
+                      <span class="home-door-knob" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           <button class="home-mascot" id="homeMascot" aria-label="Bounce the waffle cup mascot">
-            <span class="home-mascot-speech" id="homeMascotSpeech">Two cupboards are ready!</span>
+            <span class="home-mascot-speech" id="homeMascotSpeech">Three cupboards are ready!</span>
             <img src="assets/waffle-cup-mascot.webp" alt="A cheerful waffle cup filled with hot chocolate" />
           </button>
         </div>
@@ -343,26 +379,22 @@
                   <small>Web · Python · C/C++</small>
                 </button>
                 <button class="shelf-utility" data-tool="jwt" aria-label="Open JWT Inspector">
-                  <span class="shelf-new-badge">New</span>
                   <span class="utility-art utility-art-lilac"><svg><use href="#icon-jwt"></use></svg></span>
                   <span>JWT<br />Inspector</span>
                 </button>
               </div>
               <div class="category-shelf">
                 <button class="shelf-utility" data-tool="diff" aria-label="Open Diff Checker">
-                  <span class="shelf-new-badge">New</span>
                   <span class="utility-art utility-art-coral"><svg><use href="#icon-diff"></use></svg></span>
                   <span>Diff Checker</span>
                 </button>
                 <button class="shelf-utility" data-tool="markdown" aria-label="Open Markdown Studio">
-                  <span class="shelf-new-badge">New</span>
                   <span class="utility-art utility-art-teal"><svg><use href="#icon-markdown"></use></svg></span>
                   <span>Markdown<br />Studio</span>
                 </button>
               </div>
               <div class="category-shelf">
                 <button class="shelf-utility" data-tool="timestamp" aria-label="Open Timestamp Lab">
-                  <span class="shelf-new-badge">New</span>
                   <span class="utility-art utility-art-honey"><svg><use href="#icon-timestamp"></use></svg></span>
                   <span>Timestamp Lab</span>
                 </button>
@@ -398,6 +430,57 @@
 
       <button class="waffle-mascot waffle-cup-small" id="codingMascot" aria-label="Bounce the waffle cup mascot">
         <span class="mascot-speech" id="codingMascotSpeech">Dev tools are ready!</span>
+        <img src="assets/waffle-cup-mascot.webp" alt="A cheerful waffle cup filled with hot chocolate" />
+      </button>
+    </div>
+
+    <div class="game-world text-screen category-screen" id="textWorld" data-category-screen="text" hidden>
+      <button class="waffle-backdrop" id="textWaffleBackdrop" aria-label="Bounce the waffle wall"></button>
+
+      <nav class="math-nav" aria-label="Kitchen navigation">
+        <button class="back-home-button" id="backHomeText">
+          <span aria-hidden="true">←</span>
+          Home kitchen
+        </button>
+      </nav>
+
+      <header class="kitchen-header category-header">
+        <div class="hanging-rope hanging-rope-left" aria-hidden="true"></div>
+        <div class="hanging-rope hanging-rope-right" aria-hidden="true"></div>
+        <div class="title-sign text-title-sign">
+          <span class="title-doodle" aria-hidden="true">A</span>
+          <div>
+            <p>Flip it. Filter it. Save it.</p>
+            <h1>Text <span>&amp;</span> Files</h1>
+          </div>
+          <span class="title-doodle" aria-hidden="true">↻</span>
+        </div>
+      </header>
+
+      <main class="category-cabinet-scene text-cabinet-scene">
+        <section class="open-category-cabinet text-category-cabinet" aria-label="Open Text and Files cupboard containing two utilities">
+          <div class="category-cabinet-crown" aria-hidden="true"></div>
+          <div class="category-cabinet-frame">
+            <div class="category-cabinet-back">
+              <div class="category-shelf text-category-shelf">
+                <button class="shelf-utility text-shelf-utility" data-tool="fileconverter" aria-label="Open File Converter">
+                  <span class="utility-art utility-art-teal"><svg><use href="#icon-files"></use></svg></span>
+                  <span>File<br />Converter</span>
+                  <small>Images · documents · data · archives · audio</small>
+                </button>
+                <button class="shelf-utility text-shelf-utility" data-tool="textfilters" aria-label="Open Crazy Text Filters">
+                  <span class="utility-art utility-art-lilac"><svg><use href="#icon-textfilters"></use></svg></span>
+                  <span>Crazy Text<br />Filters</span>
+                  <small>40+ transformations</small>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <button class="waffle-mascot waffle-cup-small" id="textMascot" aria-label="Bounce the waffle cup mascot">
+        <span class="mascot-speech" id="textMascotSpeech">Files in, magic out!</span>
         <img src="assets/waffle-cup-mascot.webp" alt="A cheerful waffle cup filled with hot chocolate" />
       </button>
     </div>
@@ -474,6 +557,8 @@
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <div class="confetti-field" id="confettiField" aria-hidden="true"></div>
 
-    <script src="game-v7.js"></script>
+    <script src="text-files-converter-v1.js"></script>
+    <script src="text-files-filters-v1.js"></script>
+    <script src="game-v8.js"></script>
   </body>
 </html>
