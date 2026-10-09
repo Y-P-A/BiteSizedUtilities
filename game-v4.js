@@ -454,8 +454,11 @@
   backHomeButton.addEventListener("click", returnHome);
   backHomeCodingButton.addEventListener("click", returnHome);
 
-  document.querySelectorAll("[data-tool]").forEach((button) => {
-    button.addEventListener("click", () => openTool(button.dataset.tool, button));
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-tool]");
+    if (!button || !document.contains(button)) return;
+    event.preventDefault();
+    openTool(button.dataset.tool, button);
   });
 
   waffleBackdrop.addEventListener("click", () => {
