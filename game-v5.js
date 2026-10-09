@@ -172,6 +172,42 @@
       render: renderUuidForge,
       init: initUuidForge,
     },
+    jwt: {
+      title: "JWT Inspector",
+      category: "Coding & Developing",
+      categoryKey: "coding",
+      icon: "jwt",
+      color: "#c4add0",
+      render: renderJwtInspector,
+      init: initJwtInspector,
+    },
+    diff: {
+      title: "Diff Checker",
+      category: "Coding & Developing",
+      categoryKey: "coding",
+      icon: "diff",
+      color: "#e9947f",
+      render: renderDiffChecker,
+      init: initDiffChecker,
+    },
+    markdown: {
+      title: "Markdown Studio",
+      category: "Coding & Developing",
+      categoryKey: "coding",
+      icon: "markdown",
+      color: "#9cbdd2",
+      render: renderMarkdownStudio,
+      init: initMarkdownStudio,
+    },
+    timestamp: {
+      title: "Timestamp Lab",
+      category: "Coding & Developing",
+      categoryKey: "coding",
+      icon: "timestamp",
+      color: "#f2c86f",
+      render: renderTimestampLab,
+      init: initTimestampLab,
+    },
   };
 
   const categories = {
@@ -2488,6 +2524,464 @@
     generate();
   }
 
+  /* More coding and developing utilities */
+  function escapeMarkup(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function renderJwtInspector() {
+    return `
+      <div class="tool-layout dev-tool-layout">
+        <div class="game-panel panel-lilac">
+          <div class="dev-tool-heading">
+            <div><h3>Open the token</h3><p class="panel-note">Decode JWT sections locally. Signatures are displayed, never trusted or verified.</p></div>
+            <span class="dev-local-badge">LOCAL</span>
+          </div>
+          <div class="field-stack">
+            <label for="jwtInput">JSON Web Token</label>
+            <textarea class="chunky-textarea dev-code-input jwt-input" id="jwtInput" spellcheck="false" aria-label="JSON Web Token"></textarea>
+          </div>
+          <div class="button-row dev-action-row">
+            <button class="game-button" id="inspectJwt">INSPECT TOKEN</button>
+            <button class="game-button game-button-coral" id="sampleJwt">FRESH SAMPLE</button>
+            <button class="game-button game-button-small" id="copyJwtPayload">COPY PAYLOAD</button>
+          </div>
+          <p class="graph-error" id="jwtError" role="status"></p>
+        </div>
+        <div class="jwt-results">
+          <section class="jwt-part-card jwt-header-card">
+            <span class="result-kicker">Header</span>
+            <pre id="jwtHeader">{}</pre>
+          </section>
+          <section class="jwt-part-card jwt-payload-card">
+            <span class="result-kicker">Payload</span>
+            <pre id="jwtPayload">{}</pre>
+          </section>
+          <section class="result-card jwt-status-card" aria-live="polite">
+            <span class="result-kicker">Token status</span>
+            <strong class="dev-status-title" id="jwtStatus">Waiting for a token</strong>
+            <span class="result-detail" id="jwtDetails">Nothing leaves this browser.</span>
+          </section>
+        </div>
+      </div>
+    `;
+  }
+
+  function initJwtInspector(root) {
+    const input = root.querySelector("#jwtInput");
+    const headerOutput = root.querySelector("#jwtHeader");
+    const payloadOutput = root.querySelector("#jwtPayload");
+    const status = root.querySelector("#jwtStatus");
+    const details = root.querySelector("#jwtDetails");
+    const error = root.querySelector("#jwtError");
+    let decodedPayload = "{}";
+
+    function base64UrlEncode(value) {
+      const bytes = new TextEncoder().encode(value);
+      let binary = "";
+      bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+      return btoa(binary).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+    }
+
+    function base64UrlDecode(segment) {
+      const normalized = segment.replace(/-/g, "+").replace(/_/g, "/");
+      const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+      const binary = atob(padded);
+      const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+      return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    }
+
+    function makeSample() {
+      const now = Math.floor(Date.now() / 1000);
+      const header = { alg: "none", typ: "JWT" };
+      const payload = { sub: "waffle-chef", name: "CodeHub", iat: now, exp: now + 3600, cozy: true };
+      input.value = `${base64UrlEncode(JSON.stringify(header))}.${base64UrlEncode(JSON.stringify(payload))}.`;
+      inspect();
+    }
+
+    function inspect() {
+      error.textContent = "";
+      try {
+        const parts = input.value.trim().split(".");
+        if (parts.length !== 3 || !parts[0] || !parts[1]) throw new Error("A JWT needs header, payload, and signature sections separated by dots.");
+        const header = JSON.parse(base64UrlDecode(parts[0]));
+        const payload = JSON.parse(base64UrlDecode(parts[1]));
+        decodedPayload = JSON.stringify(payload, null, 2);
+        headerOutput.textContent = JSON.stringify(header, null, 2);
+        payloadOutput.textContent = decodedPayload;
+        const now = Math.floor(Date.now() / 1000);
+        const notes = [];
+        if (Number.isFinite(payload.iat)) notes.push(`Issued ${new Date(payload.iat * 1000).toLocaleString()}`);
+        if (Number.isFinite(payload.exp)) notes.push(`Expires ${new Date(payload.exp * 1000).toLocaleString()}`);
+        if (!parts[2]) {
+          status.textContent = Number.isFinite(payload.exp) && payload.exp < now ? "Expired · unsigned" : "Unexpired · unsigned";
+          notes.push("No signature is attached");
+        } else if (Number.isFinite(payload.exp) && payload.exp < now) {
+          status.textContent = "Expired token";
+          notes.push("Signature present, not verified");
+        } else {
+          status.textContent = Number.isFinite(payload.exp)
+            ? `Unexpired for ${Math.max(0, Math.ceil((payload.exp - now) / 60))} min`
+            : "Decoded token";
+          notes.push("Signature present, not verified");
+        }
+        details.textContent = notes.join(" · ") || `${Object.keys(payload).length} payload claims`;
+      } catch (caught) {
+        headerOutput.textContent = "{}";
+        payloadOutput.textContent = "{}";
+        decodedPayload = "{}";
+        status.textContent = "Could not decode";
+        details.textContent = "Check the token structure and JSON sections.";
+        error.textContent = caught.message || "That token could not be decoded.";
+      }
+    }
+
+    root.querySelector("#inspectJwt").addEventListener("click", inspect);
+    root.querySelector("#sampleJwt").addEventListener("click", makeSample);
+    root.querySelector("#copyJwtPayload").addEventListener("click", () => copyGameText(decodedPayload, "JWT payload copied!"));
+    input.addEventListener("input", inspect);
+    makeSample();
+  }
+
+  function renderDiffChecker() {
+    return `
+      <div class="tool-layout dev-tool-layout diff-layout">
+        <div class="diff-input-grid">
+          <div class="game-panel panel-coral field-stack">
+            <label for="diffBefore">Original</label>
+            <textarea class="chunky-textarea dev-code-input diff-input" id="diffBefore" spellcheck="false">const snack = "waffle";
+console.log(snack);</textarea>
+          </div>
+          <div class="game-panel panel-sage field-stack">
+            <label for="diffAfter">Changed</label>
+            <textarea class="chunky-textarea dev-code-input diff-input" id="diffAfter" spellcheck="false">const snack = "waffle";
+const topping = "cocoa";
+console.log(snack, topping);</textarea>
+          </div>
+        </div>
+        <div class="game-panel diff-result-panel">
+          <div class="dev-tool-heading">
+            <div><h3>Line-by-line changes</h3><p class="panel-note">Green was added, coral was removed.</p></div>
+            <button class="tab-button" id="diffWhitespace" aria-pressed="false">IGNORE SPACES</button>
+          </div>
+          <div class="diff-stats" id="diffStats" aria-live="polite"></div>
+          <div class="diff-output" id="diffOutput"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  function initDiffChecker(root) {
+    const before = root.querySelector("#diffBefore");
+    const after = root.querySelector("#diffAfter");
+    const output = root.querySelector("#diffOutput");
+    const stats = root.querySelector("#diffStats");
+    const whitespace = root.querySelector("#diffWhitespace");
+    let ignoreWhitespace = false;
+    let timer = null;
+
+    function compareLines(left, right) {
+      const a = left.split("\n").slice(0, 300);
+      const b = right.split("\n").slice(0, 300);
+      const normalize = (line) => ignoreWhitespace ? line.replace(/\s+/g, " ").trim() : line;
+      const matrix = Array.from({ length: a.length + 1 }, () => new Uint16Array(b.length + 1));
+      for (let i = a.length - 1; i >= 0; i -= 1) {
+        for (let j = b.length - 1; j >= 0; j -= 1) {
+          matrix[i][j] = normalize(a[i]) === normalize(b[j]) ? matrix[i + 1][j + 1] + 1 : Math.max(matrix[i + 1][j], matrix[i][j + 1]);
+        }
+      }
+      const changes = [];
+      let i = 0;
+      let j = 0;
+      while (i < a.length || j < b.length) {
+        if (i < a.length && j < b.length && normalize(a[i]) === normalize(b[j])) {
+          changes.push({ kind: "same", text: a[i] }); i += 1; j += 1;
+        } else if (j < b.length && (i === a.length || matrix[i][j + 1] >= matrix[i + 1][j])) {
+          changes.push({ kind: "add", text: b[j] }); j += 1;
+        } else {
+          changes.push({ kind: "remove", text: a[i] }); i += 1;
+        }
+      }
+      return changes;
+    }
+
+    function draw() {
+      const changes = compareLines(before.value, after.value);
+      output.innerHTML = "";
+      let additions = 0;
+      let removals = 0;
+      changes.forEach((change) => {
+        if (change.kind === "add") additions += 1;
+        if (change.kind === "remove") removals += 1;
+        const row = document.createElement("div");
+        row.className = `diff-line diff-${change.kind}`;
+        const marker = document.createElement("span");
+        marker.textContent = change.kind === "add" ? "+" : change.kind === "remove" ? "−" : " ";
+        const code = document.createElement("code");
+        code.textContent = change.text || " ";
+        row.append(marker, code);
+        output.append(row);
+      });
+      stats.innerHTML = `<span class="diff-added">+${additions} added</span><span class="diff-removed">−${removals} removed</span><span>${changes.length - additions - removals} unchanged</span>`;
+    }
+
+    function schedule() {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(draw, 160);
+    }
+    before.addEventListener("input", schedule);
+    after.addEventListener("input", schedule);
+    whitespace.addEventListener("click", () => {
+      ignoreWhitespace = !ignoreWhitespace;
+      whitespace.classList.toggle("active", ignoreWhitespace);
+      whitespace.setAttribute("aria-pressed", String(ignoreWhitespace));
+      draw();
+    });
+    addCleanup(() => window.clearTimeout(timer));
+    draw();
+  }
+
+  function renderMarkdownStudio() {
+    return `
+      <div class="tool-layout markdown-layout">
+        <section class="game-panel panel-teal markdown-editor-panel">
+          <div class="dev-tool-heading">
+            <div><h3>Markdown</h3><p class="panel-note">Headings, lists, links, quotes, emphasis, and code.</p></div>
+            <span class="dev-local-badge" id="markdownStats">0 WORDS</span>
+          </div>
+          <textarea class="chunky-textarea dev-code-input markdown-input" id="markdownInput" spellcheck="false"># Waffle Notes
+
+Build **small tools** that feel _delightful_.
+
+- Runs locally
+- Works on every screen
+- Tastes great with \`console.log()\`
+
+> Tiny tools can still be powerful.
+
+[Visit CodeHub](#codehub)</textarea>
+          <button class="game-button game-button-small" id="copyMarkdownHtml">COPY HTML</button>
+        </section>
+        <section class="game-panel markdown-preview-panel">
+          <div class="dev-tool-heading"><h3>Safe preview</h3><span class="dev-local-badge">LIVE</span></div>
+          <article class="markdown-preview" id="markdownPreview"></article>
+        </section>
+      </div>
+    `;
+  }
+
+  function initMarkdownStudio(root) {
+    const input = root.querySelector("#markdownInput");
+    const preview = root.querySelector("#markdownPreview");
+    const stats = root.querySelector("#markdownStats");
+
+    function inlineMarkdown(value) {
+      let safe = escapeMarkup(value);
+      safe = safe.replace(/`([^`]+)`/g, "<code>$1</code>");
+      safe = safe.replace(/\[([^\]]+)\]\(((?:https?:\/\/|#)[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+      safe = safe.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+      safe = safe.replace(/__([^_]+)__/g, "<strong>$1</strong>");
+      safe = safe.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+      safe = safe.replace(/_([^_]+)_/g, "<em>$1</em>");
+      return safe;
+    }
+
+    function markdownToHtml(source) {
+      const lines = source.replace(/\r/g, "").split("\n");
+      const html = [];
+      let inCode = false;
+      let codeLines = [];
+      let listType = null;
+      const closeList = () => {
+        if (listType) html.push(`</${listType}>`);
+        listType = null;
+      };
+      lines.forEach((line) => {
+        if (line.trim().startsWith("```")) {
+          closeList();
+          if (inCode) {
+            html.push(`<pre><code>${escapeMarkup(codeLines.join("\n"))}</code></pre>`);
+            codeLines = [];
+          }
+          inCode = !inCode;
+          return;
+        }
+        if (inCode) { codeLines.push(line); return; }
+        const unordered = line.match(/^\s*[-*+]\s+(.+)$/);
+        const ordered = line.match(/^\s*\d+\.\s+(.+)$/);
+        if (unordered || ordered) {
+          const nextType = unordered ? "ul" : "ol";
+          if (listType !== nextType) { closeList(); html.push(`<${nextType}>`); listType = nextType; }
+          html.push(`<li>${inlineMarkdown((unordered || ordered)[1])}</li>`);
+          return;
+        }
+        closeList();
+        const heading = line.match(/^(#{1,6})\s+(.+)$/);
+        if (heading) { const level = heading[1].length; html.push(`<h${level}>${inlineMarkdown(heading[2])}</h${level}>`); return; }
+        if (/^\s*---+\s*$/.test(line)) { html.push("<hr>"); return; }
+        if (/^>\s?/.test(line)) { html.push(`<blockquote>${inlineMarkdown(line.replace(/^>\s?/, ""))}</blockquote>`); return; }
+        if (!line.trim()) { html.push(""); return; }
+        html.push(`<p>${inlineMarkdown(line)}</p>`);
+      });
+      closeList();
+      if (inCode) html.push(`<pre><code>${escapeMarkup(codeLines.join("\n"))}</code></pre>`);
+      return html.join("\n");
+    }
+
+    function draw() {
+      preview.innerHTML = markdownToHtml(input.value);
+      const words = input.value.trim() ? input.value.trim().split(/\s+/).length : 0;
+      stats.textContent = `${words} WORD${words === 1 ? "" : "S"} · ${input.value.length} CHARS`;
+    }
+    input.addEventListener("input", draw);
+    root.querySelector("#copyMarkdownHtml").addEventListener("click", () => copyGameText(preview.innerHTML, "Rendered HTML copied!"));
+    draw();
+  }
+
+  function renderTimestampLab() {
+    return `
+      <div class="tool-layout dev-tool-layout">
+        <div class="game-panel">
+          <div class="segmented" role="tablist" aria-label="Timestamp direction">
+            <button class="tab-button active" data-time-mode="fromUnix" aria-selected="true">Unix → Date</button>
+            <button class="tab-button" data-time-mode="toUnix" aria-selected="false">Date → Unix</button>
+          </div>
+          <div id="unixTimePanel" class="timestamp-input-panel">
+            <div class="field-stack"><label for="unixTimeInput">Unix timestamp</label><input class="chunky-input" id="unixTimeInput" inputmode="numeric" /></div>
+            <div class="segmented timestamp-units" aria-label="Timestamp units">
+              <button class="tab-button active" data-time-unit="auto" aria-selected="true">Auto detect</button>
+              <button class="tab-button" data-time-unit="seconds" aria-selected="false">Seconds</button>
+              <button class="tab-button" data-time-unit="milliseconds" aria-selected="false">Milliseconds</button>
+            </div>
+          </div>
+          <div id="dateTimePanel" class="timestamp-input-panel" hidden>
+            <div class="field-stack"><label for="dateTimeInput">Local date and time</label><input class="chunky-input timestamp-date-input" id="dateTimeInput" type="datetime-local" /></div>
+          </div>
+          <div class="button-row dev-action-row">
+            <button class="game-button" id="convertTimestamp">CONVERT</button>
+            <button class="game-button game-button-coral" id="timestampNow">USE NOW</button>
+          </div>
+          <p class="graph-error" id="timestampError" role="status"></p>
+        </div>
+        <div class="timestamp-results" aria-live="polite">
+          <section class="result-card timestamp-primary">
+            <span class="result-kicker">Local time</span>
+            <strong id="timeLocal">—</strong>
+            <span class="result-detail" id="timeRelative">—</span>
+          </section>
+          <section class="game-panel panel-teal timestamp-detail-grid">
+            <div><span>UTC</span><strong id="timeUtc">—</strong></div>
+            <div><span>ISO 8601</span><strong id="timeIso">—</strong></div>
+            <div><span>Unix seconds</span><strong id="timeSeconds">—</strong></div>
+            <div><span>Milliseconds</span><strong id="timeMilliseconds">—</strong></div>
+          </section>
+        </div>
+      </div>
+    `;
+  }
+
+  function initTimestampLab(root) {
+    const unixPanel = root.querySelector("#unixTimePanel");
+    const datePanel = root.querySelector("#dateTimePanel");
+    const unixInput = root.querySelector("#unixTimeInput");
+    const dateInput = root.querySelector("#dateTimeInput");
+    const error = root.querySelector("#timestampError");
+    const localOutput = root.querySelector("#timeLocal");
+    const relativeOutput = root.querySelector("#timeRelative");
+    const utcOutput = root.querySelector("#timeUtc");
+    const isoOutput = root.querySelector("#timeIso");
+    const secondsOutput = root.querySelector("#timeSeconds");
+    const millisecondsOutput = root.querySelector("#timeMilliseconds");
+    let mode = "fromUnix";
+    let unit = "auto";
+
+    function localDateTimeValue(date) {
+      const shifted = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+      return shifted.toISOString().slice(0, 16);
+    }
+
+    function relativeTime(date) {
+      const seconds = Math.round((date.getTime() - Date.now()) / 1000);
+      const absolute = Math.abs(seconds);
+      if (absolute < 5) return "right now";
+      const ranges = [[31536000, "year"], [2592000, "month"], [86400, "day"], [3600, "hour"], [60, "minute"], [1, "second"]];
+      const [size, name] = ranges.find(([size]) => absolute >= size);
+      const amount = Math.round(absolute / size);
+      return seconds < 0 ? `${amount} ${name}${amount === 1 ? "" : "s"} ago` : `in ${amount} ${name}${amount === 1 ? "" : "s"}`;
+    }
+
+    function display(date) {
+      if (Number.isNaN(date.getTime())) throw new Error("That date or timestamp is not valid.");
+      localOutput.textContent = date.toLocaleString();
+      relativeOutput.textContent = relativeTime(date);
+      utcOutput.textContent = date.toUTCString();
+      isoOutput.textContent = date.toISOString();
+      secondsOutput.textContent = String(Math.floor(date.getTime() / 1000));
+      millisecondsOutput.textContent = String(date.getTime());
+    }
+
+    function convert() {
+      error.textContent = "";
+      try {
+        let date;
+        if (mode === "fromUnix") {
+          const raw = Number(unixInput.value.trim());
+          if (!Number.isFinite(raw)) throw new Error("Enter a numeric Unix timestamp.");
+          const milliseconds = unit === "seconds" ? raw * 1000 : unit === "milliseconds" ? raw : Math.abs(raw) < 100000000000 ? raw * 1000 : raw;
+          date = new Date(milliseconds);
+        } else {
+          if (!dateInput.value) throw new Error("Choose a local date and time first.");
+          date = new Date(dateInput.value);
+        }
+        display(date);
+      } catch (caught) {
+        error.textContent = caught.message || "That timestamp could not be converted.";
+      }
+    }
+
+    function useNow() {
+      const now = new Date();
+      unixInput.value = String(Math.floor(now.getTime() / 1000));
+      dateInput.value = localDateTimeValue(now);
+      convert();
+    }
+
+    root.querySelectorAll("[data-time-mode]").forEach((button) => {
+      button.addEventListener("click", () => {
+        mode = button.dataset.timeMode;
+        root.querySelectorAll("[data-time-mode]").forEach((tab) => {
+          const active = tab === button;
+          tab.classList.toggle("active", active);
+          tab.setAttribute("aria-selected", String(active));
+        });
+        unixPanel.hidden = mode !== "fromUnix";
+        datePanel.hidden = mode !== "toUnix";
+        convert();
+      });
+    });
+    root.querySelectorAll("[data-time-unit]").forEach((button) => {
+      button.addEventListener("click", () => {
+        unit = button.dataset.timeUnit;
+        root.querySelectorAll("[data-time-unit]").forEach((tab) => {
+          const active = tab === button;
+          tab.classList.toggle("active", active);
+          tab.setAttribute("aria-selected", String(active));
+        });
+        convert();
+      });
+    });
+    root.querySelector("#convertTimestamp").addEventListener("click", convert);
+    root.querySelector("#timestampNow").addEventListener("click", useNow);
+    unixInput.addEventListener("input", convert);
+    dateInput.addEventListener("input", convert);
+    useNow();
+  }
+
   /* CodeHub */
   const codeHubRuntimeState = {
     scriptPromises: new Map(),
@@ -2618,7 +3112,7 @@ int main() {
             </div>
             <textarea class="code-editor" id="codeEditor" aria-label="Code editor" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
             <div class="codehub-stdin" id="codeStdinWrap" hidden>
-              <label for="codeStdin">Program input</label>
+              <label for="codeStdin">C / C++ program input</label>
               <textarea id="codeStdin" class="code-stdin-input" spellcheck="false">Waffle</textarea>
             </div>
             <div class="codehub-action-row">
@@ -2791,12 +3285,20 @@ int main() {
       const output = [];
       setStatus("Loading Pyodide…", 0.1, "loading");
       const pyodide = await getPyodideRuntime(setStatus);
-      const inputs = stdin.value.replace(/\r/g, "").split("\n");
       pyodide.setStdout({ batched: (text) => output.push(text) });
       pyodide.setStderr({ batched: (text) => output.push(text) });
-      pyodide.setStdin({ stdin: () => (inputs.length ? inputs.shift() : null) });
+      const browserInputPrelude = `import builtins as __bite_builtins
+from js import window as __bite_window
+
+def __bite_browser_input(__bite_message=""):
+    __bite_answer = __bite_window.prompt(str(__bite_message))
+    if __bite_answer is None:
+        raise EOFError("Browser input cancelled")
+    return str(__bite_answer)
+
+__bite_builtins.input = __bite_browser_input`;
       setStatus("Pyodide · running", 0.86, "loading");
-      const result = await pyodide.runPythonAsync(sources.python);
+      const result = await pyodide.runPythonAsync(`${browserInputPrelude}\n\n${sources.python}`);
       if (result !== undefined && result !== null && String(result) !== "None") output.push(String(result));
       if (result && typeof result.destroy === "function") result.destroy();
       writeConsole(output.join("\n"));
@@ -2856,7 +3358,7 @@ int main() {
         button.setAttribute("aria-selected", String(active));
       });
       webFileTabs.hidden = language !== "web";
-      stdinWrap.hidden = language === "web";
+      stdinWrap.hidden = language === "web" || language === "python";
       preview.hidden = language !== "web";
       resultTitle.textContent = language === "web" ? "Live preview" : "Program output";
       consoleWrap.classList.toggle("console-large", language !== "web");

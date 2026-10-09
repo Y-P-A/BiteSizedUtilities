@@ -9,7 +9,7 @@
     />
     <title>Bite Sized Utilities</title>
     <link rel="icon" href="assets/waffle-cup-mascot.webp" />
-    <link rel="stylesheet" href="game-v4.css" />
+    <link rel="stylesheet" href="game-v5.css" />
   </head>
   <body>
     <svg class="svg-sprite" aria-hidden="true">
@@ -99,6 +99,29 @@
         <path d="M27 31h15m12 0h15M27 48h8m12 0h22M27 65h22m12 0h8" stroke="#fff1cf" stroke-width="7" stroke-linecap="round" />
         <circle cx="45" cy="31" r="4" fill="#efb94f" /><circle cx="39" cy="48" r="4" fill="#e78167" /><circle cx="55" cy="65" r="4" fill="#efb94f" />
       </symbol>
+      <symbol id="icon-jwt" viewBox="0 0 96 96">
+        <rect x="8" y="17" width="80" height="62" rx="17" fill="#c4add0" stroke="#4f2f23" stroke-width="6" />
+        <rect x="18" y="29" width="20" height="38" rx="7" fill="#e78167" stroke="#4f2f23" stroke-width="4" />
+        <rect x="42" y="29" width="20" height="38" rx="7" fill="#efb94f" stroke="#4f2f23" stroke-width="4" />
+        <rect x="66" y="29" width="12" height="38" rx="6" fill="#82b9b3" stroke="#4f2f23" stroke-width="4" />
+        <path d="M25 41h6m-6 12h6m24-12h1m-1 12h1" stroke="#fff1cf" stroke-width="5" stroke-linecap="round" />
+      </symbol>
+      <symbol id="icon-diff" viewBox="0 0 96 96">
+        <path d="M11 15h39a10 10 0 0 1 10 10v55H21A10 10 0 0 1 11 70Z" fill="#e9947f" stroke="#4f2f23" stroke-width="6" />
+        <path d="M39 20h36a10 10 0 0 1 10 10v51H49a10 10 0 0 1-10-10Z" fill="#91b782" stroke="#4f2f23" stroke-width="6" />
+        <path d="M52 39h21M52 53h21M52 67h12" stroke="#fff1cf" stroke-width="5" stroke-linecap="round" />
+        <path d="M18 43h13m-7-7v14" stroke="#4f2f23" stroke-width="5" stroke-linecap="round" />
+      </symbol>
+      <symbol id="icon-markdown" viewBox="0 0 96 96">
+        <rect x="8" y="14" width="80" height="68" rx="17" fill="#88aeca" stroke="#4f2f23" stroke-width="6" />
+        <path d="M22 62V34l13 15 13-15v28M60 35v21m-9-9 9 10 10-10" fill="none" stroke="#fff1cf" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+      </symbol>
+      <symbol id="icon-timestamp" viewBox="0 0 96 96">
+        <circle cx="48" cy="49" r="37" fill="#f0c66b" stroke="#4f2f23" stroke-width="6" />
+        <path d="M48 27v23l16 10" fill="none" stroke="#4f2f23" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M25 12 15 23m56-11 10 11" stroke="#82b9b3" stroke-width="7" stroke-linecap="round" />
+        <circle cx="48" cy="49" r="5" fill="#e78167" />
+      </symbol>
       <symbol id="icon-settings" viewBox="0 0 96 96">
         <path d="m48 8 8 9 12-1 4 12 11 6-4 12 6 11-10 8-1 12-13 1-8 10-11-7-12 4-6-11-12-4 1-13-8-9 8-10-1-12 12-5 5-11 12 3Z" fill="#efb94f" stroke="#4f2f23" stroke-width="6" stroke-linejoin="round" />
         <circle cx="48" cy="48" r="17" fill="#82b9b3" stroke="#4f2f23" stroke-width="6" />
@@ -165,7 +188,7 @@
                     <div class="home-cupboard-inside">
                       <span class="home-inside-icon"><svg><use href="#icon-codehub"></use></svg></span>
                       <strong>Coding &amp; Developing</strong>
-                      <span>6 tools ready!</span>
+                      <span>10 tools ready!</span>
                       <span class="home-shelf-board" aria-hidden="true"></span>
                     </div>
                     <button class="home-cupboard-door" id="openCodingCupboard" aria-expanded="false" aria-label="Open the Coding and Developing cupboard">
@@ -174,7 +197,7 @@
                           <svg><use href="#icon-codehub"></use></svg>
                         </span>
                         <strong>Coding <span>&amp;</span><br />Developing</strong>
-                        <small>6 utilities</small>
+                        <small>10 utilities</small>
                       </span>
                       <span class="home-door-knob" aria-hidden="true"></span>
                     </button>
@@ -306,7 +329,7 @@
       </header>
 
       <main class="category-cabinet-scene coding-cabinet-scene">
-        <section class="open-category-cabinet coding-category-cabinet" aria-label="Open Coding and Developing cupboard containing six utilities">
+        <section class="open-category-cabinet coding-category-cabinet" aria-label="Open Coding and Developing cupboard containing ten utilities">
           <div class="category-cabinet-crown" aria-hidden="true"></div>
           <div class="category-cabinet-frame">
             <div class="category-cabinet-back">
@@ -314,7 +337,7 @@
                 <button class="shelf-utility" data-tool="codehub" aria-label="Open CodeHub">
                   <span class="utility-art utility-art-code"><svg><use href="#icon-codehub"></use></svg></span>
                   <span>CodeHub</span>
-                  <small>Web · Python · C · C++</small>
+                  <small>Web · Python · C/C++</small>
                 </button>
                 <button class="shelf-utility" data-tool="json" aria-label="Open JSON Workshop">
                   <span class="utility-art utility-art-lilac"><svg><use href="#icon-json"></use></svg></span>
@@ -339,6 +362,26 @@
                 <button class="shelf-utility" data-tool="uuid" aria-label="Open UUID Forge">
                   <span class="utility-art utility-art-teal"><svg><use href="#icon-uuid"></use></svg></span>
                   <span>UUID Forge</span>
+                </button>
+              </div>
+              <div class="category-shelf">
+                <button class="shelf-utility" data-tool="jwt" aria-label="Open JWT Inspector">
+                  <span class="utility-art utility-art-lilac"><svg><use href="#icon-jwt"></use></svg></span>
+                  <span>JWT<br />Inspector</span>
+                </button>
+                <button class="shelf-utility" data-tool="diff" aria-label="Open Diff Checker">
+                  <span class="utility-art utility-art-coral"><svg><use href="#icon-diff"></use></svg></span>
+                  <span>Diff Checker</span>
+                </button>
+              </div>
+              <div class="category-shelf">
+                <button class="shelf-utility" data-tool="markdown" aria-label="Open Markdown Studio">
+                  <span class="utility-art utility-art-teal"><svg><use href="#icon-markdown"></use></svg></span>
+                  <span>Markdown<br />Studio</span>
+                </button>
+                <button class="shelf-utility" data-tool="timestamp" aria-label="Open Timestamp Lab">
+                  <span class="utility-art utility-art-honey"><svg><use href="#icon-timestamp"></use></svg></span>
+                  <span>Timestamp Lab</span>
                 </button>
               </div>
             </div>
@@ -424,6 +467,6 @@
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <div class="confetti-field" id="confettiField" aria-hidden="true"></div>
 
-    <script src="game-v4.js"></script>
+    <script src="game-v5.js"></script>
   </body>
 </html>
