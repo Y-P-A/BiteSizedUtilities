@@ -323,10 +323,10 @@
     throw new Error(`No text → ${target.toUpperCase()} recipe is available.`);
   }
 
-  async function convertSpreadsheet(file, target) {
+  async function convertSpreadsheet(file, target, sheetName = null) {
     await loadScript("xlsx.full.min.js", () => Boolean(window.XLSX?.read));
     const workbook = window.XLSX.read(await file.arrayBuffer(), { type: "array", cellDates: true });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const sheet = workbook.Sheets[sheetName && workbook.SheetNames.includes(sheetName) ? sheetName : workbook.SheetNames[0]];
     if (!sheet) throw new Error("The workbook has no sheets.");
     if (["xlsx", "xls", "xlsb", "ods"].includes(target)) return new Blob([window.XLSX.write(workbook, { bookType: target, type: "array" })], { type: mimeFor(target) });
     if (target === "csv" || target === "tsv") return new Blob([window.XLSX.utils.sheet_to_csv(sheet, { FS: target === "tsv" ? "\t" : "," })], { type: mimeFor(target) });
@@ -338,14 +338,14 @@
 
   const canvasBlob = (canvas, type, quality) => new Promise((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error(`This browser cannot encode ${type}.`)), type, quality));
 
-  async function imageCanvas(file, target) {
+  async function imageCanvas(file, target, outputScale = 1) {
     const url = URL.createObjectURL(file);
     try {
       let drawable, width, height;
       try { drawable = await createImageBitmap(file); width = drawable.width; height = drawable.height; }
       catch { drawable = await new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = () => reject(new Error("This browser cannot decode that image format.")); image.src = url; }); width = drawable.naturalWidth; height = drawable.naturalHeight; }
       if (!width || !height) throw new Error("The image has no readable dimensions.");
-      const scale = Math.min(1, 10000 / Math.max(width, height));
+      const scale = Math.min(1, 10000 / Math.max(width, height)) * (Number(outputScale) || 1);
       const canvas = document.createElement("canvas"); canvas.width = Math.max(1, Math.round(width * scale)); canvas.height = Math.max(1, Math.round(height * scale));
       const context = canvas.getContext("2d", { willReadFrequently: target === "bmp" });
       if (target === "jpg") { context.fillStyle = "#fff"; context.fillRect(0, 0, canvas.width, canvas.height); }
@@ -371,8 +371,8 @@
     return new Blob([header, png], { type: "image/x-icon" });
   }
 
-  async function convertImage(file, target, quality) {
-    const canvas = await imageCanvas(file, target);
+  async function convertImage(file, target, quality, scale = 1) {
+    const canvas = await imageCanvas(file, target, scale);
     if (target === "png") return canvasBlob(canvas, "image/png");
     if (target === "jpg") return canvasBlob(canvas, "image/jpeg", quality);
     if (target === "webp") return canvasBlob(canvas, "image/webp", quality);
@@ -445,8 +445,8 @@
       <div class="file-converter-layout">
         <section class="game-panel panel-teal converter-upload-panel">
           <div class="dev-tool-heading"><div><h3>Drop in almost anything</h3><p class="panel-note">Every conversion runs locally in this browser. Your file is never uploaded.</p></div><span class="dev-local-badge">LOCAL</span></div>
-          <input class="visually-hidden" id="converterFileInput" type="file" />
-          <button class="converter-drop-zone" id="converterDropZone" type="button"><span class="converter-drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5M7 9l5-5 5 5M5 19h14"/></svg></span><strong>DROP A FILE HERE</strong><span>or tap to choose one</span></button>
+          <input class="visually-hidden" id="converterFileInput" type="file" multiple />
+          <button class="converter-drop-zone" id="converterDropZone" type="button"><span class="converter-drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5M7 9l5-5 5 5M5 19h14"/></svg></span><strong>DROP FILES HERE</strong><span>one, or a whole batch</span></button>
           <div class="converter-file-card" id="converterFileCard" hidden><span class="converter-file-icon" id="converterFileIcon">FILE</span><div><strong id="converterFileName"></strong><span id="converterFileMeta"></span></div><button class="round-mini-button" id="converterChangeFile" aria-label="Choose a different file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 6.3M20 5v6h-6"/></svg></button></div>
           <div class="converter-support-board"><strong>REAL CONVERSION FAMILIES</strong><div class="converter-family-chips"><span>PNG · JPG · WebP · GIF · BMP · SVG · AVIF</span><span>PDF · DOCX · ODT · PPTX · EPUB</span><span>XLSX · XLS · XLSB · ODS</span><span>JSON · CSV · XML · YAML · RTF</span><span>ZIP · TAR · TAR.GZ</span><span>MP3 · WAV · OGG · M4A · AAC · FLAC → WAV</span></div><small>Animated images use their first frame. Audio decoding follows the formats supported by your browser.</small></div>
         </section>
@@ -454,44 +454,128 @@
           <div class="converter-arrow-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h14M13 6l6 6-6 6"/></svg></div>
           <div class="field-stack"><label for="converterFormat">Convert to</label><select class="chunky-input chunky-select" id="converterFormat" disabled><option>Choose a file first</option></select></div>
           <div class="converter-quality" id="converterQuality" hidden><label for="converterQualityRange">Image quality <strong id="converterQualityValue">92%</strong></label><input id="converterQualityRange" type="range" min="20" max="100" value="92" /></div>
+          <div class="converter-quality" id="converterScale" hidden><label for="converterScaleRange">Output size <strong id="converterScaleValue">100%</strong></label><input id="converterScaleRange" type="range" min="10" max="100" step="5" value="100" /></div>
+          <div class="converter-quality" id="converterSheet" hidden><label for="converterSheetSelect">Workbook sheet</label><select class="chunky-input chunky-select" id="converterSheetSelect"></select></div>
           <button class="game-button converter-run-button" id="runFileConversion" disabled>CONVERT FILE</button>
           <div class="converter-progress" id="converterProgress" hidden><span id="converterProgressBar"></span></div><p class="graph-error" id="converterError" role="status"></p>
-          <div class="converter-result-card" aria-live="polite"><span class="result-kicker">Conversion kitchen</span><strong id="converterResultTitle">Waiting for a file</strong><span id="converterResultDetail">Choose a file and its real output formats will appear here.</span><pre id="converterPreview" hidden></pre><button class="game-button game-button-sage" id="downloadConvertedFile" disabled>DOWNLOAD RESULT</button></div>
+          <div class="converter-result-card" aria-live="polite"><span class="result-kicker">Conversion kitchen</span><strong id="converterResultTitle">Waiting for a file</strong><span id="converterResultDetail">Choose a file and its real output formats will appear here.</span><pre id="converterPreview" hidden></pre><div class="button-row dev-action-row"><button class="game-button game-button-sage" id="downloadConvertedFile" disabled>DOWNLOAD RESULT</button><button class="game-button game-button-small" id="copyConvertedText" hidden>COPY TEXT</button></div></div>
         </section>
       </div>`;
   }
 
+  async function spreadsheetSheetNames(file) {
+    await loadScript("xlsx.full.min.js", () => Boolean(window.XLSX?.read));
+    const workbook = window.XLSX.read(await file.arrayBuffer(), { type: "array" });
+    return workbook.SheetNames;
+  }
+
   function initFileConverter(root, api) {
-    const input = root.querySelector("#converterFileInput"), drop = root.querySelector("#converterDropZone"), card = root.querySelector("#converterFileCard"), format = root.querySelector("#converterFormat"), qualityWrap = root.querySelector("#converterQuality"), quality = root.querySelector("#converterQualityRange"), run = root.querySelector("#runFileConversion"), error = root.querySelector("#converterError"), progress = root.querySelector("#converterProgress"), bar = root.querySelector("#converterProgressBar"), resultTitle = root.querySelector("#converterResultTitle"), resultDetail = root.querySelector("#converterResultDetail"), preview = root.querySelector("#converterPreview"), download = root.querySelector("#downloadConvertedFile");
-    let file = null, family = "unknown", outputBlob = null, outputName = "", outputUrl = null;
+    const input = root.querySelector("#converterFileInput"), drop = root.querySelector("#converterDropZone"), card = root.querySelector("#converterFileCard"), format = root.querySelector("#converterFormat"), qualityWrap = root.querySelector("#converterQuality"), quality = root.querySelector("#converterQualityRange"), scaleWrap = root.querySelector("#converterScale"), scaleRange = root.querySelector("#converterScaleRange"), scaleValue = root.querySelector("#converterScaleValue"), sheetWrap = root.querySelector("#converterSheet"), sheetSelect = root.querySelector("#converterSheetSelect"), run = root.querySelector("#runFileConversion"), error = root.querySelector("#converterError"), progress = root.querySelector("#converterProgress"), bar = root.querySelector("#converterProgressBar"), resultTitle = root.querySelector("#converterResultTitle"), resultDetail = root.querySelector("#converterResultDetail"), preview = root.querySelector("#converterPreview"), download = root.querySelector("#downloadConvertedFile"), copyText = root.querySelector("#copyConvertedText");
+    let files = [];
+    let outputBlob = null, outputName = "", outputUrl = null;
     const choices = (kind) => { const base = formats[kind] || []; const values = new Set(base.map(([value]) => value)); return [...base, ...universal.filter(([value]) => !values.has(value))]; };
-    const clearResult = () => { outputBlob = null; outputName = ""; download.disabled = true; preview.hidden = true; preview.textContent = ""; if (outputUrl) URL.revokeObjectURL(outputUrl); outputUrl = null; };
-    const updateQuality = () => { root.querySelector("#converterQualityValue").textContent = `${quality.value}%`; qualityWrap.hidden = !(family === "image" && ["jpg", "webp", "pdf"].includes(format.value)); };
-    const selectFile = (next) => {
-      if (!next) return; file = next; family = familyOf(file); clearResult(); drop.hidden = true; card.hidden = false;
-      root.querySelector("#converterFileName").textContent = file.name; root.querySelector("#converterFileMeta").textContent = `${fileSize(file.size)} · ${file.type || "unknown MIME"} · ${family}`; root.querySelector("#converterFileIcon").textContent = (extension(file.name) || "FILE").slice(0, 5).toUpperCase();
-      format.innerHTML = choices(family).map(([value, label]) => `<option value="${value}">${escapeMarkup(label)}</option>`).join(""); format.disabled = false; run.disabled = false; error.textContent = ""; resultTitle.textContent = "Ready to convert"; resultDetail.textContent = `${choices(family).length} output choices available for this ${family} file.`; updateQuality();
+    const families = () => files.map(familyOf);
+    const commonChoices = () => {
+      if (!files.length) return [];
+      const list = choices(familyOf(files[0]));
+      const otherSets = files.slice(1).map((file) => new Set(choices(familyOf(file)).map(([value]) => value)));
+      return list.filter(([value]) => otherSets.every((set) => set.has(value)));
     };
-    async function convert() {
-      if (!file) return; clearResult(); error.textContent = ""; run.disabled = true; run.textContent = "CONVERTING…"; progress.hidden = false; bar.style.width = "18%"; const target = format.value;
+    const clearResult = () => { outputBlob = null; outputName = ""; download.disabled = true; copyText.hidden = true; preview.hidden = true; preview.textContent = ""; if (outputUrl) URL.revokeObjectURL(outputUrl); outputUrl = null; };
+    const updateQuality = () => {
+      root.querySelector("#converterQualityValue").textContent = `${quality.value}%`;
+      scaleValue.textContent = `${scaleRange.value}%`;
+      const kinds = families();
+      qualityWrap.hidden = !(kinds.length === 1 && kinds[0] === "image" && ["jpg", "webp", "pdf"].includes(format.value));
+      scaleWrap.hidden = !(kinds.length >= 1 && kinds.every((kind) => kind === "image") && !["svg", "pdf", "ico"].includes(format.value));
+    };
+    async function updateSheetPicker() {
+      const kinds = families();
+      const singleSpreadsheet = files.length === 1 && kinds[0] === "spreadsheet";
+      if (!singleSpreadsheet) { sheetWrap.hidden = true; return; }
       try {
-        await new Promise(requestAnimationFrame); bar.style.width = "48%";
-        if (["base64", "dataurl", "hex"].includes(target)) outputBlob = await universalConvert(file, target);
-        else if (family === "image") outputBlob = await convertImage(file, target, Number(quality.value) / 100);
-        else if (family === "spreadsheet") outputBlob = await convertSpreadsheet(file, target);
-        else if (family === "text" || family === "document") outputBlob = await convertText(file, extension(file.name), target);
-        else if (family === "archive") outputBlob = await convertArchive(file, extension(file.name), target);
-        else if (family === "audio" && target === "wav") outputBlob = await convertAudio(file);
-        else throw new Error(`No ${family} → ${target.toUpperCase()} recipe is available.`);
-        bar.style.width = "100%"; const outExt = ["base64", "dataurl", "hex"].includes(target) ? "txt" : target === "manifest" ? "json" : target; outputName = `${baseName(file.name)}-converted.${outExt === "tgz" ? "tar.gz" : outExt}`; outputUrl = URL.createObjectURL(outputBlob); resultTitle.textContent = "Conversion complete!"; resultDetail.textContent = `${outputName} · ${fileSize(outputBlob.size)}`; download.disabled = false;
-        if (outputBlob.type.startsWith("text/") || ["application/json", "application/xml", "application/yaml"].includes(outputBlob.type)) { preview.textContent = (await outputBlob.text()).slice(0, 1800); preview.hidden = false; }
-        api.showToast("File converted locally!");
-      } catch (caught) { error.textContent = caught.message || "This file could not be converted."; resultTitle.textContent = "Conversion stopped"; resultDetail.textContent = "Try another output format or verify the source file."; }
+        const names = await spreadsheetSheetNames(files[0]);
+        sheetSelect.innerHTML = names.map((name) => `<option value="${escapeMarkup(name)}">${escapeMarkup(name)}</option>`).join("");
+        sheetWrap.hidden = names.length < 2;
+      } catch { sheetWrap.hidden = true; }
+    }
+    const selectFiles = (list) => {
+      const next = [...(list || [])].filter(Boolean).slice(0, 50);
+      if (!next.length) return;
+      files = next;
+      clearResult();
+      drop.hidden = true; card.hidden = false;
+      const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+      const single = files.length === 1;
+      root.querySelector("#converterFileName").textContent = single ? files[0].name : `${files.length} files (batch)`;
+      root.querySelector("#converterFileMeta").textContent = single ? `${fileSize(files[0].size)} · ${files[0].type || "unknown MIME"} · ${familyOf(files[0])}` : `${fileSize(totalSize)} total · ${[...new Set(families())].join(" + ")}`;
+      root.querySelector("#converterFileIcon").textContent = single ? (extension(files[0].name) || "FILE").slice(0, 5).toUpperCase() : `×${files.length}`;
+      const options = commonChoices();
+      format.innerHTML = options.map(([value, label]) => `<option value="${value}">${escapeMarkup(label)}</option>`).join("");
+      format.disabled = false; run.disabled = false; error.textContent = "";
+      resultTitle.textContent = "Ready to convert";
+      resultDetail.textContent = single ? `${options.length} output choices available for this ${familyOf(files[0])} file.` : `${options.length} shared output choices for this batch — results will be zipped.`;
+      updateQuality();
+      updateSheetPicker();
+    };
+    const outNameFor = (file, target) => {
+      const outExt = ["base64", "dataurl", "hex"].includes(target) ? "txt" : target === "manifest" ? "json" : target;
+      return `${baseName(file.name)}-converted.${outExt === "tgz" ? "tar.gz" : outExt}`;
+    };
+    async function convertOne(file, target) {
+      const kind = familyOf(file);
+      if (["base64", "dataurl", "hex"].includes(target)) return universalConvert(file, target);
+      if (kind === "image") return convertImage(file, target, Number(quality.value) / 100, Number(scaleRange.value) / 100);
+      if (kind === "spreadsheet") return convertSpreadsheet(file, target, sheetSelect.value || null);
+      if (kind === "text" || kind === "document") return convertText(file, extension(file.name), target);
+      if (kind === "archive") return convertArchive(file, extension(file.name), target);
+      if (kind === "audio" && target === "wav") return convertAudio(file);
+      throw new Error(`No ${kind} → ${target.toUpperCase()} recipe is available.`);
+    }
+    async function convert() {
+      if (!files.length) return;
+      clearResult(); error.textContent = ""; run.disabled = true; run.textContent = files.length > 1 ? `CONVERTING ${files.length}…` : "CONVERTING…"; progress.hidden = false; bar.style.width = "8%";
+      const target = format.value;
+      try {
+        await new Promise(requestAnimationFrame);
+        const results = [];
+        const failures = [];
+        for (let index = 0; index < files.length; index += 1) {
+          bar.style.width = `${8 + ((index + 0.5) / files.length) * 84}%`;
+          try { results.push({ name: outNameFor(files[index], target), blob: await convertOne(files[index], target) }); }
+          catch (caught) { failures.push(`${files[index].name}: ${caught.message}`); }
+        }
+        if (!results.length) throw new Error(failures[0] || "No files could be converted.");
+        if (results.length === 1) { outputBlob = results[0].blob; outputName = results[0].name; }
+        else {
+          const JSZip = await jsZip();
+          const zip = new JSZip();
+          const used = new Set();
+          results.forEach((entry) => {
+            let name = entry.name; let bump = 1;
+            while (used.has(name)) { name = entry.name.replace(/(\.[^.]+)$/, `-${bump}$1`); bump += 1; }
+            used.add(name);
+            zip.file(name, entry.blob);
+          });
+          outputName = "converted-batch.zip";
+          outputBlob = await zip.generateAsync({ type: "blob", mimeType: "application/zip", compression: "DEFLATE" });
+        }
+        bar.style.width = "100%";
+        outputUrl = URL.createObjectURL(outputBlob);
+        resultTitle.textContent = "Conversion complete!";
+        const summary = files.length === 1 ? `${outputName} · ${fileSize(outputBlob.size)}` : `${results.length}/${files.length} files converted → ${outputName} · ${fileSize(outputBlob.size)}`;
+        resultDetail.textContent = failures.length ? `${summary} · skipped ${failures.length}` : summary;
+        download.disabled = false;
+        if (outputBlob.type.startsWith("text/") || ["application/json", "application/xml", "application/yaml"].includes(outputBlob.type)) { preview.textContent = (await outputBlob.text()).slice(0, 1800); preview.hidden = false; copyText.hidden = false; }
+        api.showToast(files.length === 1 ? "File converted locally!" : "Batch converted locally!");
+      } catch (caught) { error.textContent = caught.message || "These files could not be converted."; resultTitle.textContent = "Conversion stopped"; resultDetail.textContent = "Try another output format or verify the source files."; }
       finally { run.disabled = false; run.textContent = "CONVERT FILE"; window.setTimeout(() => { if (root.isConnected) progress.hidden = true; }, 650); }
     }
-    drop.onclick = () => input.click(); root.querySelector("#converterChangeFile").onclick = () => input.click(); input.onchange = () => selectFile(input.files[0]);
-    ["dragenter", "dragover"].forEach((type) => drop.addEventListener(type, (event) => { event.preventDefault(); drop.classList.add("dragging"); })); ["dragleave", "drop"].forEach((type) => drop.addEventListener(type, (event) => { event.preventDefault(); drop.classList.remove("dragging"); })); drop.addEventListener("drop", (event) => selectFile(event.dataTransfer.files[0]));
-    format.onchange = updateQuality; quality.oninput = updateQuality; run.onclick = convert; download.onclick = () => { if (!outputUrl) return; const anchor = document.createElement("a"); anchor.href = outputUrl; anchor.download = outputName; document.body.append(anchor); anchor.click(); anchor.remove(); };
+    drop.onclick = () => input.click(); root.querySelector("#converterChangeFile").onclick = () => input.click(); input.onchange = () => selectFiles(input.files);
+    ["dragenter", "dragover"].forEach((type) => drop.addEventListener(type, (event) => { event.preventDefault(); drop.classList.add("dragging"); })); ["dragleave", "drop"].forEach((type) => drop.addEventListener(type, (event) => { event.preventDefault(); drop.classList.remove("dragging"); })); drop.addEventListener("drop", (event) => selectFiles(event.dataTransfer.files));
+    format.onchange = updateQuality; quality.oninput = updateQuality; scaleRange.oninput = updateQuality; run.onclick = convert;
+    download.onclick = () => { if (!outputUrl) return; const anchor = document.createElement("a"); anchor.href = outputUrl; anchor.download = outputName; document.body.append(anchor); anchor.click(); anchor.remove(); };
+    copyText.onclick = () => api.copyGameText ? api.copyGameText(preview.textContent, "Converted text copied!") : undefined;
     api.addCleanup(() => { if (outputUrl) URL.revokeObjectURL(outputUrl); });
   }
 

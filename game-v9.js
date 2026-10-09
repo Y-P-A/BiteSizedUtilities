@@ -222,7 +222,7 @@
       icon: "files",
       color: "#9cbdd2",
       render: () => window.TextFilesTools.renderFileConverter(),
-      init: (root) => window.TextFilesTools.initFileConverter(root, { showToast, addCleanup }),
+      init: (root) => window.TextFilesTools.initFileConverter(root, { showToast, addCleanup, copyGameText }),
     },
     textfilters: {
       title: "Crazy Text Filters",
